@@ -4,6 +4,13 @@
 
 - Fixed use of wrong data type on PlatformApp setting the darkTheme property (thanks SileyGames)
 
+## [7.0.0+1]
+
+#### (Flutter version support: v3.19.6)
+
+- Hotfix for [type-cast issue](https://github.com/bdlukaa/fluent_ui/issues/519#issuecomment-1240266393) in `PlatformTabScaffold`
+- Remove 'docs' dir.
+
 ## [7.0.0]
 
 #### (Flutter version support: v3.19.6)

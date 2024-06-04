@@ -5,7 +5,12 @@
  */
 
 import 'package:fluent_ui/fluent_ui.dart'
-    show NavigationAppBar, NavigationPane, NavigationView, PaneItem;
+    show
+        NavigationAppBar,
+        NavigationPane,
+        NavigationPaneItem,
+        NavigationView,
+        PaneItem;
 import 'package:flutter/cupertino.dart'
     show
         CupertinoPageScaffold,
@@ -579,7 +584,9 @@ MaterialTabController cannot be null.
                       title: tab.text,
                     ),
                   )
-                  .toList(growable: false),
+                  .toList(growable: false)
+                  // See error at https://github.com/bdlukaa/fluent_ui/issues/519#issuecomment-1240266393
+                  .cast<NavigationPaneItem>(),
             )
           : null,
     );
@@ -617,6 +624,7 @@ class MaterialTabController extends ChangeNotifier {
 
   int get index => _index;
   int _index;
+
   set index(int value) {
     assert(value >= 0);
     if (_index == value) {
@@ -650,6 +658,7 @@ class FluentTabController extends ChangeNotifier {
 
   int get index => _index;
   int _index;
+
   set index(int value) {
     assert(value >= 0);
     if (_index == value) {
