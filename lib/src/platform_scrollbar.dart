@@ -6,6 +6,7 @@
 
 import 'package:flutter/cupertino.dart' show CupertinoScrollbar;
 import 'package:flutter/material.dart' show Scrollbar;
+import 'package:fluent_ui/fluent_ui.dart' as fluent;
 import 'package:flutter/widgets.dart';
 
 import 'platform.dart';
@@ -76,8 +77,38 @@ class CupertinoScrollbarData extends _BaseData {
   final Radius? radiusWhileDragging;
 }
 
-class PlatformScrollbar
-    extends PlatformWidgetBase<CupertinoScrollbar, Scrollbar> {
+class FluentScrollbarData extends _BaseData {
+  FluentScrollbarData({
+    // Common
+    super.widgetKey,
+    super.child,
+    super.controller,
+    super.thumbVisibility,
+    super.thickness,
+    super.radius,
+    super.scrollbarOrientation,
+
+    // Fluent
+    this.trackVisibility,
+    this.interactive,
+    this.notificationPredicate,
+    this.scrollbarThemeData,
+  });
+
+  final bool? trackVisibility;
+  final bool? interactive;
+  final bool Function(fluent.ScrollNotification)? notificationPredicate;
+  final fluent.ScrollbarThemeData? scrollbarThemeData;
+}
+
+class PlatformScrollbar extends PlatformWidgetBase<
+    Scrollbar,
+    CupertinoScrollbar,
+    fluent.Scrollbar,
+    CupertinoScrollbar,
+    Scrollbar,
+    Scrollbar,
+    Scrollbar> {
   //Common
   final Key? widgetKey;
   final Widget child;
@@ -91,8 +122,13 @@ class PlatformScrollbar
   //Platform
   final PlatformBuilder<MaterialScrollbarData>? material;
   final PlatformBuilder<CupertinoScrollbarData>? cupertino;
+  final PlatformBuilder<FluentScrollbarData>? windows;
+  final PlatformBuilder<CupertinoScrollbarData>? macos;
+  final PlatformBuilder<MaterialScrollbarData>? linux;
+  final PlatformBuilder<CupertinoScrollbarData>? web;
+  final PlatformBuilder<MaterialScrollbarData>? fuschsia;
 
-  PlatformScrollbar({
+  const PlatformScrollbar({
     //Common
     super.key,
     this.widgetKey,
@@ -106,6 +142,11 @@ class PlatformScrollbar
     //Platform
     this.material,
     this.cupertino,
+    this.windows,
+    this.macos,
+    this.linux,
+    this.web,
+    this.fuschsia,
   });
 
   @override
@@ -153,4 +194,35 @@ class PlatformScrollbar
           CupertinoScrollbar.defaultRadiusWhileDragging,
     );
   }
+
+  @override
+  fluent.Scrollbar createWindowsWidget(BuildContext context) {
+    final data = windows?.call(context, platform(context));
+    return fluent.Scrollbar(
+      //Common
+      key: data?.widgetKey ?? widgetKey,
+      controller: data?.controller ?? controller,
+      thumbVisibility: data?.thumbVisibility ?? thumbVisibility,
+      scrollbarOrientation: data?.scrollbarOrientation ?? scrollbarOrientation,
+      interactive: data?.interactive,
+      style: data?.scrollbarThemeData,
+      child: data?.child ?? child,
+    );
+  }
+
+  @override
+  CupertinoScrollbar createMacosWidget(BuildContext context) =>
+      createCupertinoWidget(context);
+
+  @override
+  Scrollbar createLinuxWidget(BuildContext context) =>
+      createMaterialWidget(context);
+
+  @override
+  Scrollbar createWebWidget(BuildContext context) =>
+      createMaterialWidget(context);
+
+  @override
+  Scrollbar createFuchsiaWidget(BuildContext context) =>
+      createMaterialWidget(context);
 }

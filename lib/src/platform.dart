@@ -6,6 +6,7 @@
 
 import 'dart:ui';
 
+import 'package:fluent_ui/fluent_ui.dart' as fluent;
 import 'package:flutter/cupertino.dart'
     show
         CupertinoDynamicColor,
@@ -15,9 +16,10 @@ import 'package:flutter/cupertino.dart'
         showCupertinoModalPopup;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart'
-    show Theme, ThemeData, Colors, showDialog, showModalBottomSheet;
+    show Colors, Theme, ThemeData, showDialog, showModalBottomSheet;
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'package:flutter_extended_platform_widgets/flutter_extended_platform_widgets.dart';
 
 const double _defaultScrollControlDisabledMaxHeightRatio = 9.0 / 16.0;
 
@@ -55,41 +57,68 @@ PlatformStyle _platformStyle(BuildContext context) {
   final platformStyle = PlatformProvider.of(context)?.settings.platformStyle;
 
   if (platform == null && kIsWeb) {
-    return platformStyle?.web ?? PlatformStyle.Material;
+    return platformStyle?.web ?? PlatformStyle.material;
   }
 
   switch (platform ?? Theme.of(context).platform) {
     case TargetPlatform.android:
-      return platformStyle?.android ?? PlatformStyle.Material;
+      return platformStyle?.android ?? PlatformStyle.material;
     case TargetPlatform.fuchsia:
-      return platformStyle?.fuchsia ?? PlatformStyle.Material;
+      return platformStyle?.fuchsia ?? PlatformStyle.fuchsia;
     case TargetPlatform.iOS:
-      return platformStyle?.ios ?? PlatformStyle.Cupertino;
+      return platformStyle?.ios ?? PlatformStyle.cupertino;
     case TargetPlatform.linux:
-      return platformStyle?.linux ?? PlatformStyle.Material;
+      return platformStyle?.linux ?? PlatformStyle.linux;
     case TargetPlatform.macOS:
-      return platformStyle?.macos ?? PlatformStyle.Cupertino;
+      return platformStyle?.macos ?? PlatformStyle.macos;
     case TargetPlatform.windows:
-      return platformStyle?.windows ?? PlatformStyle.Material;
+      return platformStyle?.windows ?? PlatformStyle.windows;
   }
 }
 
-bool isMaterial(BuildContext context) {
-  return _platformStyle(context) == PlatformStyle.Material;
-}
-
-bool isCupertino(BuildContext context) {
-  return _platformStyle(context) == PlatformStyle.Cupertino;
-}
+bool isMaterial(BuildContext context) =>
+    _platformStyle(context) == PlatformStyle.material;
+bool isCupertino(BuildContext context) =>
+    _platformStyle(context) == PlatformStyle.cupertino;
+bool isWindows(BuildContext context) =>
+    PlatformStyle.windows == _platformStyle(context);
+bool isMacos(BuildContext context) =>
+    _platformStyle(context) == PlatformStyle.macos;
+bool isLinux(BuildContext context) =>
+    _platformStyle(context) == PlatformStyle.linux;
+bool isFuchsia(BuildContext context) =>
+    _platformStyle(context) == PlatformStyle.fuchsia;
+bool isWeb(BuildContext context) =>
+    _platformStyle(context) == PlatformStyle.web;
 
 T platformThemeData<T>(
   BuildContext context, {
   required T Function(ThemeData theme) material,
   required T Function(CupertinoThemeData theme) cupertino,
+  required T Function(fluent.FluentThemeData theme) windows,
+  required T Function(CupertinoThemeData theme) macos,
+  required T Function(ThemeData theme) linux,
+  required T Function(ThemeData theme) fuchsia,
+  required T Function(ThemeData theme) web,
 }) {
-  return isMaterial(context)
-      ? material(Theme.of(context))
-      : cupertino(CupertinoTheme.of(context));
+  if (isMaterial(context)) {
+    return material(Theme.of(context));
+  } else if (isCupertino(context)) {
+    return cupertino(CupertinoTheme.of(context));
+  } else if (isWindows(context)) {
+    return windows(fluent.FluentTheme.of(context));
+  } else if (isMacos(context)) {
+    return macos(CupertinoTheme.of(context));
+  } else if (isLinux(context)) {
+    return linux(Theme.of(context));
+  } else if (isFuchsia(context)) {
+    return fuchsia(Theme.of(context));
+  } else if (isWeb(context)) {
+    return web(Theme.of(context));
+  }
+
+  return throw UnsupportedError(
+      'This platform is not supported: $defaultTargetPlatform');
 }
 
 PlatformTarget platform(BuildContext context) {
@@ -114,13 +143,6 @@ PlatformTarget platform(BuildContext context) {
 }
 
 abstract class _DialogBaseData {
-  final WidgetBuilder? builder;
-  final bool? barrierDismissible;
-  final RouteSettings? routeSettings;
-  final bool? useRootNavigator;
-  final String? barrierLabel;
-  final Offset? anchorPoint;
-
   _DialogBaseData({
     this.builder,
     this.barrierDismissible,
@@ -129,6 +151,12 @@ abstract class _DialogBaseData {
     this.barrierLabel,
     this.anchorPoint,
   });
+  final WidgetBuilder? builder;
+  final bool? barrierDismissible;
+  final RouteSettings? routeSettings;
+  final bool? useRootNavigator;
+  final String? barrierLabel;
+  final Offset? anchorPoint;
 }
 
 class MaterialDialogData extends _DialogBaseData {
@@ -160,10 +188,86 @@ class CupertinoDialogData extends _DialogBaseData {
   });
 }
 
+class WindowsDialogData extends _DialogBaseData {
+  WindowsDialogData({
+    super.builder,
+    super.barrierDismissible,
+    super.routeSettings,
+    super.useRootNavigator,
+    super.barrierLabel,
+    super.anchorPoint,
+  });
+}
+
+class MacosDialogData extends _DialogBaseData {
+  MacosDialogData({
+    super.builder,
+    super.barrierDismissible,
+    super.routeSettings,
+    super.useRootNavigator,
+    super.barrierLabel,
+    super.anchorPoint,
+    this.useSafeArea,
+    this.barrierColor,
+  });
+  final bool? useSafeArea;
+  final Color? barrierColor;
+}
+
+class LinuxDialogData extends _DialogBaseData {
+  LinuxDialogData({
+    super.builder,
+    super.barrierDismissible,
+    super.routeSettings,
+    super.useRootNavigator,
+    super.barrierLabel,
+    super.anchorPoint,
+    this.useSafeArea,
+    this.barrierColor,
+  });
+  final bool? useSafeArea;
+  final Color? barrierColor;
+}
+
+class WebDialogData extends _DialogBaseData {
+  WebDialogData({
+    super.builder,
+    super.barrierDismissible,
+    super.routeSettings,
+    super.useRootNavigator,
+    super.barrierLabel,
+    super.anchorPoint,
+    this.useSafeArea,
+    this.barrierColor,
+  });
+  final bool? useSafeArea;
+  final Color? barrierColor;
+}
+
+class FuchsiaDialogData extends _DialogBaseData {
+  FuchsiaDialogData({
+    super.builder,
+    super.barrierDismissible,
+    super.routeSettings,
+    super.useRootNavigator,
+    super.barrierLabel,
+    super.anchorPoint,
+    this.useSafeArea,
+    this.barrierColor,
+  });
+  final bool? useSafeArea;
+  final Color? barrierColor;
+}
+
 Future<T?> showPlatformDialog<T>({
   required BuildContext context,
   MaterialDialogData? material,
   CupertinoDialogData? cupertino,
+  MacosDialogData? macos,
+  WindowsDialogData? windows,
+  LinuxDialogData? linux,
+  WebDialogData? web,
+  FuchsiaDialogData? fuchsia,
   WidgetBuilder? builder,
   bool? barrierDismissible,
   RouteSettings? routeSettings,
@@ -187,7 +291,7 @@ Future<T?> showPlatformDialog<T>({
       anchorPoint: material?.anchorPoint ?? anchorPoint,
       traversalEdgeBehavior: material?.traversalEdgeBehavior,
     );
-  } else {
+  } else if (isCupertino(context)) {
     assert(cupertino?.builder != null || builder != null);
 
     return showCupertinoDialog<T>(
@@ -200,11 +304,74 @@ Future<T?> showPlatformDialog<T>({
       barrierLabel: cupertino?.barrierLabel ?? barrierLabel,
       anchorPoint: cupertino?.anchorPoint ?? anchorPoint,
     );
+  } else if (isWindows(context)) {
+    assert(windows?.builder != null || builder != null);
+
+    return fluent.showDialog<T>(
+      context: context,
+      builder: windows?.builder ?? builder!,
+      barrierDismissible:
+          windows?.barrierDismissible ?? barrierDismissible ?? true,
+      routeSettings: windows?.routeSettings ?? routeSettings,
+      useRootNavigator: windows?.useRootNavigator ?? useRootNavigator,
+      barrierLabel: windows?.barrierLabel ?? barrierLabel,
+    );
+  } else if (isMacos(context)) {
+    assert(cupertino?.builder != null || builder != null);
+
+    return showCupertinoDialog<T>(
+      context: context,
+      builder: cupertino?.builder ?? builder!,
+      routeSettings: cupertino?.routeSettings ?? routeSettings,
+      useRootNavigator: cupertino?.useRootNavigator ?? useRootNavigator,
+      barrierDismissible:
+          cupertino?.barrierDismissible ?? barrierDismissible ?? false,
+      barrierLabel: cupertino?.barrierLabel ?? barrierLabel,
+      anchorPoint: cupertino?.anchorPoint ?? anchorPoint,
+    );
+  } else if (isLinux(context)) {
+    assert(linux?.builder != null || builder != null);
+
+    return showDialog<T>(
+      context: context,
+      builder: linux?.builder ?? builder!,
+      barrierDismissible:
+          linux?.barrierDismissible ?? barrierDismissible ?? true,
+      routeSettings: linux?.routeSettings ?? routeSettings,
+      useRootNavigator: linux?.useRootNavigator ?? useRootNavigator,
+      barrierLabel: linux?.barrierLabel ?? barrierLabel,
+      anchorPoint: linux?.anchorPoint ?? anchorPoint,
+    );
+  } else if (isWeb(context)) {
+    assert(web?.builder != null || builder != null);
+
+    return showDialog<T>(
+      context: context,
+      builder: web?.builder ?? builder!,
+      barrierDismissible: web?.barrierDismissible ?? barrierDismissible ?? true,
+      routeSettings: web?.routeSettings ?? routeSettings,
+      useRootNavigator: web?.useRootNavigator ?? useRootNavigator,
+      barrierLabel: web?.barrierLabel ?? barrierLabel,
+      anchorPoint: web?.anchorPoint ?? anchorPoint,
+    );
+  } else {
+    assert(fuchsia?.builder != null || builder != null);
+
+    return showDialog<T>(
+      context: context,
+      builder: fuchsia?.builder ?? builder!,
+      barrierDismissible:
+          fuchsia?.barrierDismissible ?? barrierDismissible ?? true,
+      routeSettings: fuchsia?.routeSettings ?? routeSettings,
+      useRootNavigator: fuchsia?.useRootNavigator ?? useRootNavigator,
+      barrierLabel: fuchsia?.barrierLabel ?? barrierLabel,
+      anchorPoint: fuchsia?.anchorPoint ?? anchorPoint,
+    );
   }
 }
 
 abstract class _ModalSheetBaseData {
-  _ModalSheetBaseData({
+  const _ModalSheetBaseData({
     this.anchorPoint,
   });
 
@@ -225,11 +392,11 @@ class MaterialModalSheetData extends _ModalSheetBaseData {
   final AnimationController? transitionAnimationController;
   final BoxConstraints? constraints;
   final bool? useSafeArea;
-  String? barrierLabel;
-  double? scrollControlDisabledMaxHeightRatio;
-  bool? showDragHandle;
+  final String? barrierLabel;
+  final double? scrollControlDisabledMaxHeightRatio;
+  final bool? showDragHandle;
 
-  MaterialModalSheetData({
+  const MaterialModalSheetData({
     super.anchorPoint,
     this.backgroundColor,
     this.elevation,
@@ -251,14 +418,7 @@ class MaterialModalSheetData extends _ModalSheetBaseData {
 }
 
 class CupertinoModalSheetData extends _ModalSheetBaseData {
-  final ImageFilter? imageFilter;
-  final bool? semanticsDismissible;
-  final bool? useRootNavigator;
-  final Color? barrierColor;
-  final bool? barrierDismissible;
-  final RouteSettings? routeSettings;
-
-  CupertinoModalSheetData({
+  const CupertinoModalSheetData({
     super.anchorPoint,
     this.imageFilter,
     this.semanticsDismissible,
@@ -267,6 +427,152 @@ class CupertinoModalSheetData extends _ModalSheetBaseData {
     this.barrierDismissible,
     this.routeSettings,
   });
+  final ImageFilter? imageFilter;
+  final bool? semanticsDismissible;
+  final bool? useRootNavigator;
+  final Color? barrierColor;
+  final bool? barrierDismissible;
+  final RouteSettings? routeSettings;
+}
+
+class WindowsModalSheetData {
+  const WindowsModalSheetData({
+    this.backgroundColor,
+    this.elevation,
+    this.shape,
+    this.isScrollControlled,
+    this.useRootNavigator,
+    this.barrierColor,
+    this.enableDrag,
+    this.isDismissible,
+    this.routeSettings,
+    this.transitionAnimationController,
+  });
+  final Color? backgroundColor;
+  final double? elevation;
+  final ShapeBorder? shape;
+  final bool? isScrollControlled;
+  final bool? useRootNavigator;
+  final Color? barrierColor;
+  final bool? enableDrag;
+  final bool? isDismissible;
+  final RouteSettings? routeSettings;
+  final AnimationController? transitionAnimationController;
+}
+
+//Todo(mehul): Make them platform-specific
+class MacosModalSheetData extends _ModalSheetBaseData {
+  MacosModalSheetData({
+    super.anchorPoint,
+    this.imageFilter,
+    this.semanticsDismissible,
+    this.useRootNavigator,
+    this.barrierColor,
+    this.barrierDismissible,
+    this.routeSettings,
+  });
+  final ImageFilter? imageFilter;
+  final bool? semanticsDismissible;
+  final bool? useRootNavigator;
+  final Color? barrierColor;
+  final bool? barrierDismissible;
+  final RouteSettings? routeSettings;
+}
+
+class LinuxModalSheetData extends _ModalSheetBaseData {
+  const LinuxModalSheetData({
+    super.anchorPoint,
+    this.backgroundColor,
+    this.elevation,
+    this.shape,
+    this.isScrollControlled,
+    this.useRootNavigator,
+    this.clipBehavior,
+    this.barrierColor,
+    this.enableDrag,
+    this.isDismissible,
+    this.routeSettings,
+    this.transitionAnimationController,
+    this.constraints,
+    this.useSafeArea,
+  });
+  final Color? backgroundColor;
+  final double? elevation;
+  final ShapeBorder? shape;
+  final bool? isScrollControlled;
+  final bool? useRootNavigator;
+  final Clip? clipBehavior;
+  final Color? barrierColor;
+  final bool? enableDrag;
+  final bool? isDismissible;
+  final RouteSettings? routeSettings;
+  final AnimationController? transitionAnimationController;
+  final BoxConstraints? constraints;
+  final bool? useSafeArea;
+}
+
+class WebModalSheetData extends _ModalSheetBaseData {
+  WebModalSheetData({
+    super.anchorPoint,
+    this.backgroundColor,
+    this.elevation,
+    this.shape,
+    this.isScrollControlled,
+    this.useRootNavigator,
+    this.clipBehavior,
+    this.barrierColor,
+    this.enableDrag,
+    this.isDismissible,
+    this.routeSettings,
+    this.transitionAnimationController,
+    this.constraints,
+    this.useSafeArea,
+  });
+  final Color? backgroundColor;
+  final double? elevation;
+  final ShapeBorder? shape;
+  final bool? isScrollControlled;
+  final bool? useRootNavigator;
+  final Clip? clipBehavior;
+  final Color? barrierColor;
+  final bool? enableDrag;
+  final bool? isDismissible;
+  final RouteSettings? routeSettings;
+  final AnimationController? transitionAnimationController;
+  final BoxConstraints? constraints;
+  final bool? useSafeArea;
+}
+
+class FuchsiaModalSheetData extends _ModalSheetBaseData {
+  FuchsiaModalSheetData({
+    super.anchorPoint,
+    this.backgroundColor,
+    this.elevation,
+    this.shape,
+    this.isScrollControlled,
+    this.useRootNavigator,
+    this.clipBehavior,
+    this.barrierColor,
+    this.enableDrag,
+    this.isDismissible,
+    this.routeSettings,
+    this.transitionAnimationController,
+    this.constraints,
+    this.useSafeArea,
+  });
+  final Color? backgroundColor;
+  final double? elevation;
+  final ShapeBorder? shape;
+  final bool? isScrollControlled;
+  final bool? useRootNavigator;
+  final Clip? clipBehavior;
+  final Color? barrierColor;
+  final bool? enableDrag;
+  final bool? isDismissible;
+  final RouteSettings? routeSettings;
+  final AnimationController? transitionAnimationController;
+  final BoxConstraints? constraints;
+  final bool? useSafeArea;
 }
 
 /// Displays either the showModalBottomSheet for material
@@ -276,6 +582,11 @@ Future<T?> showPlatformModalSheet<T>({
   required WidgetBuilder builder,
   MaterialModalSheetData? material,
   CupertinoModalSheetData? cupertino,
+  MacosModalSheetData? macos,
+  WindowsModalSheetData? windows,
+  LinuxModalSheetData? linux,
+  WebModalSheetData? web,
+  FuchsiaModalSheetData? fuchsia,
 }) {
   if (isMaterial(context)) {
     return showModalBottomSheet<T>(
@@ -301,7 +612,7 @@ Future<T?> showPlatformModalSheet<T>({
               _defaultScrollControlDisabledMaxHeightRatio,
       showDragHandle: material?.showDragHandle,
     );
-  } else {
+  } else if (isCupertino(context)) {
     return showCupertinoModalPopup<T>(
       context: context,
       builder: builder,
@@ -312,6 +623,93 @@ Future<T?> showPlatformModalSheet<T>({
       barrierDismissible: cupertino?.barrierDismissible ?? true,
       routeSettings: cupertino?.routeSettings,
       anchorPoint: cupertino?.anchorPoint,
+    );
+  } else if (isWindows(context)) {
+    throw PlatformException(code: 'Widget has no Windows implementation');
+    // return fluent.showDialog(
+    //   context: context,
+    //   builder: builder,
+    //   backgroundColor: windows?.backgroundColor,
+    //   elevation: windows?.elevation,
+    //   shape: windows?.shape,
+    //   isScrollControlled: windows?.isScrollControlled ?? false,
+    //   useRootNavigator: windows?.useRootNavigator ?? false,
+    //   barrierColor: windows?.barrierColor,
+    //   enableDrag: windows?.enableDrag ?? true,
+    //   isDismissible: windows?.isDismissible ?? true,
+    //   routeSettings: windows?.routeSettings,
+    //   transitionAnimationController: windows?.transitionAnimationController,
+    // );
+  }
+  //Todo(mehul): Make them platform-specific
+  else if (isMacos(context)) {
+    return showCupertinoModalPopup<T>(
+      context: context,
+      builder: builder,
+      filter: macos?.imageFilter,
+      semanticsDismissible: macos?.semanticsDismissible ?? false,
+      useRootNavigator: macos?.useRootNavigator ?? true,
+      barrierColor: macos?.barrierColor ?? _kModalBarrierColor,
+      barrierDismissible: macos?.barrierDismissible ?? true,
+      routeSettings: macos?.routeSettings,
+      anchorPoint: macos?.anchorPoint,
+    );
+  } else if (isLinux(context)) {
+    return showModalBottomSheet<T>(
+      context: context,
+      builder: builder,
+      backgroundColor: linux?.backgroundColor,
+      elevation: linux?.elevation,
+      shape: linux?.shape,
+      isScrollControlled: linux?.isScrollControlled ?? false,
+      useRootNavigator: linux?.useRootNavigator ?? false,
+      clipBehavior: linux?.clipBehavior,
+      barrierColor: linux?.barrierColor,
+      enableDrag: linux?.enableDrag ?? true,
+      isDismissible: linux?.isDismissible ?? true,
+      routeSettings: linux?.routeSettings,
+      transitionAnimationController: linux?.transitionAnimationController,
+      constraints: linux?.constraints,
+      anchorPoint: linux?.anchorPoint,
+      useSafeArea: linux?.useSafeArea ?? false,
+    );
+  } else if (isWeb(context)) {
+    return showModalBottomSheet<T>(
+      context: context,
+      builder: builder,
+      backgroundColor: web?.backgroundColor,
+      elevation: web?.elevation,
+      shape: web?.shape,
+      isScrollControlled: web?.isScrollControlled ?? false,
+      useRootNavigator: web?.useRootNavigator ?? false,
+      clipBehavior: web?.clipBehavior,
+      barrierColor: web?.barrierColor,
+      enableDrag: web?.enableDrag ?? true,
+      isDismissible: web?.isDismissible ?? true,
+      routeSettings: web?.routeSettings,
+      transitionAnimationController: web?.transitionAnimationController,
+      constraints: web?.constraints,
+      anchorPoint: web?.anchorPoint,
+      useSafeArea: web?.useSafeArea ?? false,
+    );
+  } else {
+    return showModalBottomSheet<T>(
+      context: context,
+      builder: builder,
+      backgroundColor: fuchsia?.backgroundColor,
+      elevation: fuchsia?.elevation,
+      shape: fuchsia?.shape,
+      isScrollControlled: fuchsia?.isScrollControlled ?? false,
+      useRootNavigator: fuchsia?.useRootNavigator ?? false,
+      clipBehavior: fuchsia?.clipBehavior,
+      barrierColor: fuchsia?.barrierColor,
+      enableDrag: fuchsia?.enableDrag ?? true,
+      isDismissible: fuchsia?.isDismissible ?? true,
+      routeSettings: fuchsia?.routeSettings,
+      transitionAnimationController: fuchsia?.transitionAnimationController,
+      constraints: fuchsia?.constraints,
+      anchorPoint: fuchsia?.anchorPoint,
+      useSafeArea: fuchsia?.useSafeArea ?? false,
     );
   }
 }

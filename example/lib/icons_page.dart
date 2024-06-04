@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'package:flutter_extended_platform_widgets/flutter_extended_platform_widgets.dart';
 
 import 'platform_widget_example.dart';
 
@@ -44,8 +44,7 @@ class IconsPage extends StatelessWidget {
                   _IconCompared('accountCircleSolid',
                       (c) => c.platformIcons.accountCircleSolid),
                   _IconCompared('add', (c) => c.platformIcons.add),
-                  _IconCompared(
-                      'addCircled', (c) => c.platformIcons.addCircled),
+                  _IconCompared('addCircled', (c) => c.platformIcons.add),
                   _IconCompared('addCircledOutline',
                       (c) => c.platformIcons.addCircledOutline),
                   _IconCompared('addCircledSolid',
@@ -59,15 +58,16 @@ class IconsPage extends StatelessWidget {
                       'batteryFull', (c) => c.platformIcons.batteryFull),
                   _IconCompared('bluetooth', (c) => c.platformIcons.bluetooth),
                   _IconCompared('book', (c) => c.platformIcons.book),
-                  _IconCompared('bookmark', (c) => c.platformIcons.bookmark),
-                  _IconCompared('bookmarkOutline',
-                      (c) => c.platformIcons.bookmarkOutline),
+                  _IconCompared(
+                      'bookmark', (c) => c.platformIcons.bookmarkSolid),
+                  _IconCompared(
+                      'bookmarkOutline', (c) => c.platformIcons.bookmark),
                   _IconCompared(
                       'bookmarkSolid', (c) => c.platformIcons.bookmarkSolid),
                   _IconCompared(
-                      'brightness', (c) => c.platformIcons.brightness),
-                  _IconCompared('brightnessSolid',
-                      (c) => c.platformIcons.brightnessSolid),
+                      'brightness', (c) => c.platformIcons.brightnessLow),
+                  _IconCompared(
+                      'brightnessSolid', (c) => c.platformIcons.brightnessHigh),
                   _IconCompared('bus', (c) => c.platformIcons.bus),
                   _IconCompared('car', (c) => c.platformIcons.car),
                   _IconCompared('checkBoxBlankOutlineRounded',
@@ -86,12 +86,6 @@ class IconsPage extends StatelessWidget {
                   _IconCompared('checkMarkCircledSolid',
                       (c) => c.platformIcons.checkMarkCircledSolid),
                   _IconCompared('clear', (c) => c.platformIcons.clear),
-                  _IconCompared(
-                      'clearThick', (c) => c.platformIcons.clearThick),
-                  _IconCompared('clearThickCircled',
-                      (c) => c.platformIcons.clearThickCircled),
-                  _IconCompared(
-                      'clockSolid', (c) => c.platformIcons.clockSolid),
                   _IconCompared('cloud', (c) => c.platformIcons.cloud),
                   _IconCompared(
                       'cloudSolid', (c) => c.platformIcons.cloudSolid),
@@ -103,12 +97,10 @@ class IconsPage extends StatelessWidget {
                       'cloudUpload', (c) => c.platformIcons.cloudUpload),
                   _IconCompared('cloudUploadSolid',
                       (c) => c.platformIcons.cloudUploadSolid),
-                  _IconCompared(
-                      'collections', (c) => c.platformIcons.collections),
+                  _IconCompared('collections',
+                      (c) => c.platformIcons.collectionsOutlined),
                   _IconCompared('collectionsSolid',
                       (c) => c.platformIcons.collectionsSolid),
-                  _IconCompared('conversationBubble',
-                      (c) => c.platformIcons.conversationBubble),
                   _IconCompared('conversationBubbleOutline',
                       (c) => c.platformIcons.conversationBubbleOutline),
                   _IconCompared('create', (c) => c.platformIcons.create),
@@ -145,12 +137,9 @@ class IconsPage extends StatelessWidget {
                       'gameController', (c) => c.platformIcons.gameController),
                   _IconCompared('gameControllerSolid',
                       (c) => c.platformIcons.gameControllerSolid),
-                  _IconCompared('gearSolid', (c) => c.platformIcons.gearSolid),
                   _IconCompared('group', (c) => c.platformIcons.group),
                   _IconCompared(
                       'groupSolid', (c) => c.platformIcons.groupSolid),
-                  _IconCompared(
-                      'heartSolid', (c) => c.platformIcons.heartSolid),
                   _IconCompared('help', (c) => c.platformIcons.help),
                   _IconCompared(
                       'helpOutline', (c) => c.platformIcons.helpOutline),
@@ -158,7 +147,8 @@ class IconsPage extends StatelessWidget {
                   _IconCompared('info', (c) => c.platformIcons.info),
                   _IconCompared(
                       'leftChevron', (c) => c.platformIcons.leftChevron),
-                  _IconCompared('location', (c) => c.platformIcons.location),
+                  _IconCompared(
+                      'location', (c) => c.platformIcons.locationOutline),
                   _IconCompared(
                       'locationSolid', (c) => c.platformIcons.locationSolid),
                   _IconCompared('loop', (c) => c.platformIcons.loop),
@@ -178,8 +168,6 @@ class IconsPage extends StatelessWidget {
                   _IconCompared(
                       'padlockSolid', (c) => c.platformIcons.padlockSolid),
                   _IconCompared('pause', (c) => c.platformIcons.pause),
-                  _IconCompared('pawSolid', (c) => c.platformIcons.pawSolid),
-                  _IconCompared('pen', (c) => c.platformIcons.pen),
                   _IconCompared('person', (c) => c.platformIcons.person),
                   _IconCompared('personAdd', (c) => c.platformIcons.personAdd),
                   _IconCompared(
@@ -233,18 +221,19 @@ class IconsPage extends StatelessWidget {
                   _IconCompared('star', (c) => c.platformIcons.star),
                   _IconCompared('starCircleSolid',
                       (c) => c.platformIcons.starCircleSolid),
-                  _IconCompared(
-                      'switchCamera', (c) => c.platformIcons.switchCamera),
+                  _IconCompared('switchCamera',
+                      (c) => c.platformIcons.switchCameraOutlined),
                   _IconCompared('switchCameraSolid',
                       (c) => c.platformIcons.switchCameraSolid),
                   _IconCompared('tag', (c) => c.platformIcons.tag),
                   _IconCompared(
                       'tagOutline', (c) => c.platformIcons.tagOutline),
                   _IconCompared('tagSolid', (c) => c.platformIcons.tagSolid),
-                  _IconCompared('thumbDown', (c) => c.platformIcons.thumbDown),
+                  _IconCompared(
+                      'thumbDown', (c) => c.platformIcons.thumbDownSolid),
                   _IconCompared('thumbDownOutlined',
                       (c) => c.platformIcons.thumbDownOutlined),
-                  _IconCompared('thumbUp', (c) => c.platformIcons.thumbUp),
+                  _IconCompared('thumbUp', (c) => c.platformIcons.thumbUpSolid),
                   _IconCompared('thumbUpOutlined',
                       (c) => c.platformIcons.thumbUpOutlined),
                   _IconCompared('time', (c) => c.platformIcons.time),

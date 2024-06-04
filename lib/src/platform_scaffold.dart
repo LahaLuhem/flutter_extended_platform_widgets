@@ -4,6 +4,8 @@
  * See LICENSE for distribution and usage details.
  */
 
+import 'package:fluent_ui/fluent_ui.dart'
+    show NavigationAppBar, NavigationPane, NavigationView;
 import 'package:flutter/cupertino.dart'
     show
         CupertinoPageScaffold,
@@ -21,12 +23,12 @@ import 'package:flutter/material.dart'
         Scaffold;
 import 'package:flutter/widgets.dart';
 
-import 'extensions.dart';
-import 'platform.dart';
-import 'platform_app_bar.dart';
-import 'platform_nav_bar.dart';
-import 'platform_provider.dart';
-import 'widget_base.dart';
+import 'package:flutter_extended_platform_widgets/src/extensions.dart';
+import 'package:flutter_extended_platform_widgets/src/platform.dart';
+import 'package:flutter_extended_platform_widgets/src/platform_app_bar.dart';
+import 'package:flutter_extended_platform_widgets/src/platform_nav_bar.dart';
+import 'package:flutter_extended_platform_widgets/src/platform_provider.dart';
+import 'package:flutter_extended_platform_widgets/src/widget_base.dart';
 
 abstract class _BaseData {
   _BaseData({
@@ -116,22 +118,22 @@ class CupertinoPageScaffoldData extends _BaseData {
   final String? restorationIdTab;
 }
 
-class PlatformScaffold extends PlatformWidgetBase<Widget, Scaffold> {
-  final Key? widgetKey;
+class FluentScaffoldData extends _BaseData {
+  FluentScaffoldData({
+    super.backgroundColor,
+    super.body,
+    super.widgetKey,
+    this.appBar,
+    this.pane,
+  });
 
-  final Widget? body;
-  final Color? backgroundColor;
-  final PlatformAppBar? appBar;
-  final PlatformNavBar? bottomNavBar;
-  final IndexedWidgetBuilder? cupertinoTabChildBuilder;
+  final NavigationAppBar? appBar;
+  final NavigationPane? pane;
+}
 
-  final PlatformBuilder<MaterialScaffoldData>? material;
-  final PlatformBuilder<CupertinoPageScaffoldData>? cupertino;
-
-  final bool iosContentPadding;
-  final bool iosContentBottomPadding;
-
-  PlatformScaffold({
+class PlatformScaffold extends PlatformWidgetBase<Scaffold, Widget,
+    NavigationView, Widget, Scaffold, Scaffold, Scaffold> {
+  const PlatformScaffold({
     super.key,
     this.widgetKey,
     this.body,
@@ -142,8 +144,31 @@ class PlatformScaffold extends PlatformWidgetBase<Widget, Scaffold> {
     this.iosContentBottomPadding = false,
     this.material,
     this.cupertino,
+    this.windows,
+    this.macos,
+    this.linux,
+    this.fuchsia,
+    this.web,
     this.cupertinoTabChildBuilder,
   });
+  final Key? widgetKey;
+
+  final Widget? body;
+  final Color? backgroundColor;
+  final PlatformAppBar? appBar;
+  final PlatformNavBar? bottomNavBar;
+  final IndexedWidgetBuilder? cupertinoTabChildBuilder;
+
+  final PlatformBuilder<MaterialScaffoldData>? material;
+  final PlatformBuilder<CupertinoPageScaffoldData>? cupertino;
+  final PlatformBuilder<FluentScaffoldData>? windows;
+  final PlatformBuilder<CupertinoPageScaffoldData>? macos;
+  final PlatformBuilder<MaterialScaffoldData>? linux;
+  final PlatformBuilder<MaterialScaffoldData>? fuchsia;
+  final PlatformBuilder<MaterialScaffoldData>? web;
+
+  final bool iosContentPadding;
+  final bool iosContentBottomPadding;
 
   @override
   Scaffold createMaterialWidget(BuildContext context) {
@@ -186,7 +211,7 @@ class PlatformScaffold extends PlatformWidgetBase<Widget, Scaffold> {
   Widget createCupertinoWidget(BuildContext context) {
     final data = cupertino?.call(context, platform(context));
 
-    var navigationBar =
+    final navigationBar =
         data?.navigationBar ?? appBar?.createCupertinoWidget(context);
 
     final providerState = PlatformProvider.of(context);
@@ -196,7 +221,7 @@ class PlatformScaffold extends PlatformWidgetBase<Widget, Scaffold> {
 
     Widget result;
     if (bottomNavBar != null) {
-      var tabBar =
+      final tabBar =
           data?.bottomTabBar ?? bottomNavBar?.createCupertinoWidget(context);
 
       //https://docs.flutter.io/flutter/cupertino/CupertinoTabScaffold-class.html
@@ -207,62 +232,68 @@ class PlatformScaffold extends PlatformWidgetBase<Widget, Scaffold> {
         tabBar: tabBar!,
         controller: data?.controller,
         tabBuilder: (BuildContext context, int index) {
-          var currentChild = cupertinoTabChildBuilder?.call(context, index) ??
+          final currentChild = cupertinoTabChildBuilder?.call(context, index) ??
               data?.body ??
               body ??
-              SizedBox.shrink();
+              const SizedBox.shrink();
           return CupertinoPageScaffold(
             // key
             backgroundColor: data?.backgroundColor ?? backgroundColor,
+            navigationBar: navigationBar,
+            resizeToAvoidBottomInset: data?.resizeToAvoidBottomInset ?? true,
             child: iosContentPad(
               context,
               currentChild.withMaterial(useMaterial),
               navigationBar,
               tabBar,
             ),
-            navigationBar: navigationBar,
-            resizeToAvoidBottomInset: data?.resizeToAvoidBottomInset ?? true,
             // key: widgetKey used for CupertinoTabScaffold
           );
         },
         restorationId: data?.restorationIdTab,
       );
     } else {
-      final child = data?.body ?? body ?? SizedBox.shrink();
+      final child = data?.body ?? body ?? const SizedBox.shrink();
 
       result = CupertinoPageScaffold(
         key: data?.widgetKey ?? widgetKey,
         backgroundColor: data?.backgroundColor ?? backgroundColor,
+        navigationBar: navigationBar,
+        resizeToAvoidBottomInset: data?.resizeToAvoidBottomInset ?? true,
         child: iosContentPad(
           context,
           child.withMaterial(useMaterial),
           navigationBar,
           null,
         ),
-        navigationBar: navigationBar,
-        resizeToAvoidBottomInset: data?.resizeToAvoidBottomInset ?? true,
       );
     }
 
     // Ensure that there is Material widget at the root page level
     // as there can be Material widgets used on ios
-    return result.withMaterial(useLegacyMaterial &&
-        context.findAncestorWidgetOfExactType<Material>() == null);
+    return result.withMaterial(
+      useLegacyMaterial &&
+          context.findAncestorWidgetOfExactType<Material>() == null,
+    );
   }
 
-  Widget iosContentPad(BuildContext context, Widget child,
-      ObstructingPreferredSizeWidget? navigationBar, CupertinoTabBar? tabBar) {
-    final MediaQueryData existingMediaQuery = MediaQuery.of(context);
+  Widget iosContentPad(
+    BuildContext context,
+    Widget child,
+    ObstructingPreferredSizeWidget? navigationBar,
+    CupertinoTabBar? tabBar,
+  ) {
+    final existingMediaQuery = MediaQuery.of(context);
 
     if (!iosContentPadding && !iosContentBottomPadding) {
       return child;
     }
 
-    double top = 0;
-    double bottom = 0;
+    var top = 0.0;
+    var bottom = 0.0;
 
     if (iosContentPadding && navigationBar != null) {
-      final double topPadding =
+      final topPadding =
           navigationBar.preferredSize.height + existingMediaQuery.padding.top;
 
       final obstruct = navigationBar.shouldFullyObstruct(context);
@@ -279,4 +310,44 @@ class PlatformScaffold extends PlatformWidgetBase<Widget, Scaffold> {
       child: child,
     );
   }
+
+  @override
+  NavigationView createWindowsWidget(BuildContext context) {
+    final data = windows?.call(context, platform(context));
+
+    return NavigationView(
+      key: data?.widgetKey ?? widgetKey,
+      appBar: data?.appBar ??
+          NavigationAppBar(
+            key: appBar?.widgetKey,
+            title: appBar?.title,
+            leading: appBar?.leading,
+            actions: Row(
+              children: [...?appBar?.trailingActions],
+            ),
+            automaticallyImplyLeading:
+                appBar?.automaticallyImplyLeading ?? true,
+            backgroundColor: appBar?.backgroundColor,
+          ),
+      pane: data?.pane,
+      content: data?.body ?? body,
+    );
+  }
+
+  //Todo(mehul): change themes here
+  @override
+  Widget createMacosWidget(BuildContext context) =>
+      createCupertinoWidget(context);
+
+  @override
+  Scaffold createLinuxWidget(BuildContext context) =>
+      createMaterialWidget(context);
+
+  @override
+  Scaffold createFuchsiaWidget(BuildContext context) =>
+      createMaterialWidget(context);
+
+  @override
+  Scaffold createWebWidget(BuildContext context) =>
+      createMaterialWidget(context);
 }

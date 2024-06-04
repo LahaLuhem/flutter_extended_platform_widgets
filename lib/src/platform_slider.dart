@@ -4,6 +4,7 @@
  * See LICENSE for distribution and usage details.
  */
 
+import 'package:fluent_ui/fluent_ui.dart' as fluent;
 import 'package:flutter/cupertino.dart' show CupertinoColors, CupertinoSlider;
 import 'package:flutter/material.dart'
     show
@@ -12,9 +13,8 @@ import 'package:flutter/material.dart'
         Slider,
         SliderInteraction;
 import 'package:flutter/widgets.dart';
-
-import 'platform.dart';
-import 'widget_base.dart';
+import 'package:flutter_extended_platform_widgets/src/platform.dart';
+import 'package:flutter_extended_platform_widgets/src/widget_base.dart';
 
 abstract class _BaseData {
   _BaseData({
@@ -93,7 +93,55 @@ class CupertinoSliderData extends _BaseData {
   });
 }
 
-class PlatformSlider extends PlatformWidgetBase<CupertinoSlider, Slider> {
+class FluentSliderData extends _BaseData {
+  FluentSliderData({
+    super.widgetKey,
+    super.value,
+    super.onChanged,
+    super.onChangeStart,
+    super.onChangeEnd,
+    super.divisions,
+    super.min,
+    super.max,
+    super.activeColor,
+    super.thumbColor,
+    this.vertical,
+    this.label,
+    this.focusNode,
+    this.mouseCursor,
+    this.autofocus,
+  });
+
+  final bool? vertical;
+  final String? label;
+  final FocusNode? focusNode;
+  final MouseCursor? mouseCursor;
+  final bool? autofocus;
+}
+
+class PlatformSlider extends PlatformWidgetBase<Slider, CupertinoSlider,
+    fluent.Slider, CupertinoSlider, Slider, Slider, Slider> {
+  const PlatformSlider({
+    required this.value,
+    required this.onChanged,
+    super.key,
+    this.widgetKey,
+    this.onChangeStart,
+    this.onChangeEnd,
+    this.activeColor,
+    this.divisions,
+    this.min = 0.0,
+    this.max = 1.0,
+    this.thumbColor,
+    this.material,
+    this.cupertino,
+    this.windows,
+    this.macos,
+    this.linux,
+    this.fuchsia,
+    this.web,
+  })  : assert(divisions == null || divisions > 0),
+        assert(value >= min && value <= max);
   final Key? widgetKey;
 
   final double value;
@@ -108,23 +156,11 @@ class PlatformSlider extends PlatformWidgetBase<CupertinoSlider, Slider> {
 
   final PlatformBuilder<MaterialSliderData>? material;
   final PlatformBuilder<CupertinoSliderData>? cupertino;
-
-  PlatformSlider({
-    super.key,
-    this.widgetKey,
-    required this.value,
-    required this.onChanged,
-    this.onChangeStart,
-    this.onChangeEnd,
-    this.activeColor,
-    this.divisions,
-    this.min = 0.0,
-    this.max = 1.0,
-    this.thumbColor,
-    this.material,
-    this.cupertino,
-  })  : assert(divisions == null || divisions > 0),
-        assert(value >= min && value <= max);
+  final PlatformBuilder<FluentSliderData>? windows;
+  final PlatformBuilder<CupertinoSliderData>? macos;
+  final PlatformBuilder<MaterialSliderData>? linux;
+  final PlatformBuilder<MaterialSliderData>? fuchsia;
+  final PlatformBuilder<MaterialSliderData>? web;
 
   @override
   Slider createMaterialWidget(BuildContext context) {
@@ -171,4 +207,41 @@ class PlatformSlider extends PlatformWidgetBase<CupertinoSlider, Slider> {
       thumbColor: data?.thumbColor ?? thumbColor ?? CupertinoColors.white,
     );
   }
+
+  @override
+  fluent.Slider createWindowsWidget(BuildContext context) {
+    final data = windows?.call(context, platform(context));
+
+    return fluent.Slider(
+      key: data?.widgetKey ?? widgetKey,
+      vertical: data?.vertical ?? false,
+      value: data?.value ?? value,
+      onChanged: data?.onChanged ?? onChanged,
+      onChangeStart: data?.onChangeStart ?? onChangeStart,
+      onChangeEnd: data?.onChangeEnd ?? onChangeEnd,
+      divisions: data?.divisions ?? divisions,
+      max: data?.max ?? max,
+      min: data?.min ?? min,
+      label: data?.label,
+      focusNode: data?.focusNode,
+      mouseCursor: data?.mouseCursor ?? MouseCursor.defer,
+      autofocus: data?.autofocus ?? false,
+    );
+  }
+
+  //Todo(mehul): change themes here
+  @override
+  CupertinoSlider createMacosWidget(BuildContext context) =>
+      createCupertinoWidget(context);
+
+  @override
+  Slider createLinuxWidget(BuildContext context) =>
+      createMaterialWidget(context);
+
+  @override
+  Slider createFuchsiaWidget(BuildContext context) =>
+      createMaterialWidget(context);
+
+  @override
+  Slider createWebWidget(BuildContext context) => createMaterialWidget(context);
 }

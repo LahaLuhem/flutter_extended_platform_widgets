@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'package:flutter_extended_platform_widgets/flutter_extended_platform_widgets.dart';
 
 extension WidgetExt on Widget {
   Widget maxWidth(double maxWidth) {
@@ -16,17 +16,19 @@ extension WidgetExt on Widget {
 }
 
 extension DisplayPlatformTarget on TargetPlatform {
-  String get text => this == TargetPlatform.iOS ? 'Cupertino' : 'Material';
+  String get text {
+    final cleaned = toString().replaceAll('TargetPlatform.', '');
+    return cleaned[0].toUpperCase() + cleaned.substring(1);
+  }
 }
 
 extension PlatformTargetExt on WidgetBuilder {
-  Widget asMaterial() {
-    return asPlatform(TargetPlatform.android);
-  }
-
-  Widget asCupertino() {
-    return asPlatform(TargetPlatform.iOS);
-  }
+  Widget asMaterial() => asPlatform(TargetPlatform.android);
+  Widget asCupertino() => asPlatform(TargetPlatform.iOS);
+  Widget asWindows() => asPlatform(TargetPlatform.windows);
+  Widget asMacos() => asPlatform(TargetPlatform.macOS);
+  Widget asLinux() => asPlatform(TargetPlatform.linux);
+  Widget asFuchsia() => asPlatform(TargetPlatform.fuchsia);
 
   Widget asPlatform(TargetPlatform platform) {
     return Builder(

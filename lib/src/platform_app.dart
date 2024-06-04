@@ -4,6 +4,7 @@
  * See LICENSE for distribution and usage details.
  */
 
+import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/cupertino.dart' show CupertinoApp, CupertinoThemeData;
 import 'package:flutter/material.dart'
     show
@@ -14,6 +15,7 @@ import 'package:flutter/material.dart'
         ThemeMode,
         kThemeAnimationDuration;
 import 'package:flutter/widgets.dart';
+import 'package:macos_ui/macos_ui.dart';
 
 import 'platform.dart';
 import 'platform_theme.dart';
@@ -329,7 +331,82 @@ class CupertinoAppRouterData extends _BaseRouterData {
   final CupertinoThemeData? theme;
 }
 
-class PlatformApp extends PlatformWidgetBase<CupertinoApp, MaterialApp> {
+class FluentAppData extends _BaseData {
+  FluentAppData({
+    super.widgetKey,
+    super.navigatorKey,
+    super.home,
+    super.routes,
+    super.initialRoute,
+    super.onGenerateRoute,
+    super.onUnknownRoute,
+    super.navigatorObservers,
+    super.builder,
+    super.title,
+    super.onGenerateTitle,
+    super.color,
+    super.locale,
+    super.shortcuts,
+    super.actions,
+    super.onGenerateInitialRoutes,
+    super.localizationsDelegates,
+    super.localeListResolutionCallback,
+    super.localeResolutionCallback,
+    super.supportedLocales,
+    super.showPerformanceOverlay,
+    super.checkerboardRasterCacheImages,
+    super.checkerboardOffscreenLayers,
+    super.showSemanticsDebugger,
+    super.debugShowCheckedModeBanner,
+    super.scrollBehavior,
+    this.theme,
+    this.darkTheme,
+    this.themeMode,
+  });
+
+  final FluentThemeData? theme;
+  final FluentThemeData? darkTheme;
+  final ThemeMode? themeMode;
+}
+
+class FluentAppRouterData extends _BaseRouterData {
+  FluentAppRouterData({
+    super.widgetKey,
+    super.builder,
+    super.title,
+    super.onGenerateTitle,
+    super.color,
+    super.locale,
+    super.localizationsDelegates,
+    super.localeListResolutionCallback,
+    super.localeResolutionCallback,
+    super.supportedLocales,
+    super.showPerformanceOverlay,
+    super.checkerboardRasterCacheImages,
+    super.checkerboardOffscreenLayers,
+    super.showSemanticsDebugger,
+    super.debugShowCheckedModeBanner,
+    super.routeInformationProvider,
+    super.routeInformationParser,
+    super.routerDelegate,
+    super.routerConfig,
+    super.shortcuts,
+    super.actions,
+    super.onGenerateInitialRoutes,
+    super.scrollBehavior,
+    super.onNavigationNotification,
+    this.theme,
+    this.darkTheme,
+    this.themeMode,
+  });
+
+  final FluentThemeData? theme;
+  final FluentThemeData? darkTheme;
+  final ThemeMode? themeMode;
+}
+
+class PlatformApp extends PlatformWidgetBase<MaterialApp, CupertinoApp,
+    FluentApp, CupertinoApp, MaterialApp, MaterialApp, MaterialApp> {
   final Key? widgetKey;
   final GlobalKey<NavigatorState>? navigatorKey;
   final Widget? home;
@@ -360,8 +437,18 @@ class PlatformApp extends PlatformWidgetBase<CupertinoApp, MaterialApp> {
 
   final PlatformBuilder<MaterialAppData>? material;
   final PlatformBuilder<CupertinoAppData>? cupertino;
+  final PlatformBuilder<FluentAppData>? windows;
+  final PlatformBuilder<CupertinoAppData>? macos;
+  final PlatformBuilder<MaterialAppData>? linux;
+  final PlatformBuilder<MaterialAppData>? web;
+  final PlatformBuilder<MaterialAppData>? fuchsia;
   final PlatformBuilder<MaterialAppRouterData>? materialRouter;
   final PlatformBuilder<CupertinoAppRouterData>? cupertinoRouter;
+  final PlatformBuilder<FluentAppRouterData>? windowsRouter;
+  final PlatformBuilder<CupertinoAppRouterData>? macosRouter;
+  final PlatformBuilder<MaterialAppRouterData>? linuxRouter;
+  final PlatformBuilder<MaterialAppRouterData>? webRouter;
+  final PlatformBuilder<MaterialAppRouterData>? fuchsiaRouter;
 
   /// {@macro flutter.widgets.widgetsApp.routeInformationProvider}
   final RouteInformationProvider? routeInformationProvider;
@@ -414,13 +501,23 @@ class PlatformApp extends PlatformWidgetBase<CupertinoApp, MaterialApp> {
     this.onNavigationNotification,
     this.material,
     this.cupertino,
+    this.macos,
+    this.windows,
+    this.linux,
+    this.fuchsia,
+    this.web,
   })  : routeInformationProvider = null,
         routeInformationParser = null,
         routerDelegate = null,
         routerConfig = null,
         backButtonDispatcher = null,
         materialRouter = null,
-        cupertinoRouter = null;
+        cupertinoRouter = null,
+        windowsRouter = null,
+        macosRouter = null,
+        linuxRouter = null,
+        fuchsiaRouter = null,
+        webRouter = null;
 
   const PlatformApp.router({
     super.key,
@@ -451,6 +548,11 @@ class PlatformApp extends PlatformWidgetBase<CupertinoApp, MaterialApp> {
     this.onNavigationNotification,
     PlatformBuilder<MaterialAppRouterData>? material,
     PlatformBuilder<CupertinoAppRouterData>? cupertino,
+    PlatformBuilder<CupertinoAppRouterData>? macos,
+    PlatformBuilder<FluentAppRouterData>? windows,
+    PlatformBuilder<MaterialAppRouterData>? linux,
+    PlatformBuilder<MaterialAppRouterData>? fuchsia,
+    PlatformBuilder<MaterialAppRouterData>? web,
   })  : navigatorObservers = null,
         navigatorKey = null,
         onGenerateRoute = null,
@@ -461,8 +563,18 @@ class PlatformApp extends PlatformWidgetBase<CupertinoApp, MaterialApp> {
         initialRoute = null,
         material = null,
         cupertino = null,
+        macos = null,
+        windows = null,
+        linux = null,
+        fuchsia = null,
+        web = null,
         materialRouter = material,
-        cupertinoRouter = cupertino;
+        cupertinoRouter = cupertino,
+        macosRouter = macos,
+        windowsRouter = windows,
+        linuxRouter = linux,
+        fuchsiaRouter = fuchsia,
+        webRouter = web;
 
   @override
   createMaterialWidget(BuildContext context) {
@@ -756,4 +868,152 @@ class PlatformApp extends PlatformWidgetBase<CupertinoApp, MaterialApp> {
 
     return theme;
   }
+
+  @override
+  FluentApp createWindowsWidget(BuildContext context) {
+    final dataRouter = windowsRouter?.call(context, platform(context));
+
+    if (routeInformationParser != null ||
+        dataRouter?.routeInformationParser != null ||
+        routerConfig != null ||
+        dataRouter?.routerConfig != null) {
+      assert(
+        dataRouter?.routerDelegate != null ||
+            routerDelegate != null ||
+            dataRouter?.routerConfig != null ||
+            routerConfig != null,
+      );
+      return FluentApp.router(
+        routeInformationProvider:
+            dataRouter?.routeInformationProvider ?? routeInformationProvider,
+        routeInformationParser:
+            dataRouter?.routeInformationParser ?? routeInformationParser,
+        routerDelegate: dataRouter?.routerDelegate ?? routerDelegate,
+        routerConfig: dataRouter?.routerConfig ?? routerConfig,
+        backButtonDispatcher:
+            dataRouter?.backButtonDispatcher ?? backButtonDispatcher,
+        builder: dataRouter?.builder ?? builder,
+        title: dataRouter?.title ?? title ?? '',
+        onGenerateTitle: dataRouter?.onGenerateTitle ?? onGenerateTitle,
+        color: dataRouter?.color ?? color,
+        theme: dataRouter?.theme ?? _getFluentLightTheme(context),
+        darkTheme: dataRouter?.darkTheme ?? _getFluentDarkTheme(context),
+        themeMode: dataRouter?.themeMode ??
+            _getFluentThemeMode(context) ??
+            ThemeMode.system,
+        locale: dataRouter?.locale ?? locale,
+        localizationsDelegates:
+            dataRouter?.localizationsDelegates ?? localizationsDelegates,
+        localeListResolutionCallback:
+            dataRouter?.localeListResolutionCallback ??
+                localeListResolutionCallback,
+        localeResolutionCallback:
+            dataRouter?.localeResolutionCallback ?? localeResolutionCallback,
+        supportedLocales: dataRouter?.supportedLocales ??
+            supportedLocales ??
+            const <Locale>[Locale('en', 'US')],
+        showPerformanceOverlay: dataRouter?.showPerformanceOverlay ??
+            showPerformanceOverlay ??
+            false,
+        checkerboardRasterCacheImages:
+            dataRouter?.checkerboardRasterCacheImages ??
+                checkerboardRasterCacheImages ??
+                false,
+        checkerboardOffscreenLayers: dataRouter?.checkerboardOffscreenLayers ??
+            checkerboardOffscreenLayers ??
+            false,
+        showSemanticsDebugger:
+            dataRouter?.showSemanticsDebugger ?? showSemanticsDebugger ?? false,
+        debugShowCheckedModeBanner: dataRouter?.debugShowCheckedModeBanner ??
+            debugShowCheckedModeBanner ??
+            true,
+        shortcuts: dataRouter?.shortcuts ?? shortcuts,
+        actions: dataRouter?.actions ?? actions,
+        key: dataRouter?.widgetKey ?? widgetKey,
+        restorationScopeId:
+            dataRouter?.restorationScopeId ?? restorationScopeId,
+        scrollBehavior: dataRouter?.scrollBehavior ??
+            scrollBehavior ??
+            const FluentScrollBehavior(),
+      );
+    } else {
+      final data = windows?.call(context, platform(context));
+      return FluentApp(
+        key: data?.widgetKey ?? widgetKey,
+        navigatorKey: data?.navigatorKey ?? navigatorKey,
+        home: data?.home ?? home,
+        routes: data?.routes ?? routes ?? const <String, WidgetBuilder>{},
+        initialRoute: data?.initialRoute ?? initialRoute,
+        onGenerateRoute: data?.onGenerateRoute ?? onGenerateRoute,
+        onUnknownRoute: data?.onUnknownRoute ?? onUnknownRoute,
+        navigatorObservers: data?.navigatorObservers ??
+            navigatorObservers ??
+            const <NavigatorObserver>[],
+        builder: data?.builder ?? builder,
+        title: data?.title ?? title ?? '',
+        onGenerateTitle: data?.onGenerateTitle ?? onGenerateTitle,
+        color: data?.color ?? color,
+        locale: data?.locale ?? locale,
+        localizationsDelegates:
+            data?.localizationsDelegates ?? localizationsDelegates,
+        localeListResolutionCallback:
+            data?.localeListResolutionCallback ?? localeListResolutionCallback,
+        localeResolutionCallback:
+            data?.localeResolutionCallback ?? localeResolutionCallback,
+        supportedLocales: data?.supportedLocales ??
+            supportedLocales ??
+            const <Locale>[Locale('en', 'US')],
+        showPerformanceOverlay:
+            data?.showPerformanceOverlay ?? showPerformanceOverlay ?? false,
+        checkerboardRasterCacheImages: data?.checkerboardRasterCacheImages ??
+            checkerboardRasterCacheImages ??
+            false,
+        checkerboardOffscreenLayers: data?.checkerboardOffscreenLayers ??
+            checkerboardOffscreenLayers ??
+            false,
+        showSemanticsDebugger:
+            data?.showSemanticsDebugger ?? showSemanticsDebugger ?? false,
+        debugShowCheckedModeBanner: data?.debugShowCheckedModeBanner ??
+            debugShowCheckedModeBanner ??
+            true,
+        theme: dataRouter?.theme ?? _getFluentLightTheme(context),
+        darkTheme: dataRouter?.darkTheme ?? _getFluentDarkTheme(context),
+        themeMode: dataRouter?.themeMode ??
+            _getFluentThemeMode(context) ??
+            ThemeMode.system,
+        shortcuts: data?.shortcuts ?? shortcuts,
+        actions: data?.actions ?? actions,
+        onGenerateInitialRoutes:
+            data?.onGenerateInitialRoutes ?? onGenerateInitialRoutes,
+        restorationScopeId: data?.restorationScopeId ?? restorationScopeId,
+        scrollBehavior: data?.scrollBehavior ??
+            scrollBehavior ??
+            const FluentScrollBehavior(),
+      );
+    }
+  }
+
+  FluentThemeData? _getFluentLightTheme(BuildContext context) =>
+      PlatformTheme.of(context)?.fluentLightTheme;
+  FluentThemeData? _getFluentDarkTheme(BuildContext context) =>
+      PlatformTheme.of(context)?.fluentDarkTheme;
+  ThemeMode? _getFluentThemeMode(BuildContext context) =>
+      PlatformTheme.of(context)?.themeMode;
+
+  //Todo(mehul): change themes here
+  @override
+  CupertinoApp createMacosWidget(BuildContext context) =>
+      createCupertinoWidget(context);
+
+  @override
+  MaterialApp createLinuxWidget(BuildContext context) =>
+      createMaterialWidget(context);
+
+  @override
+  MaterialApp createFuchsiaWidget(BuildContext context) =>
+      createMaterialWidget(context);
+
+  @override
+  MaterialApp createWebWidget(BuildContext context) =>
+      createMaterialWidget(context);
 }

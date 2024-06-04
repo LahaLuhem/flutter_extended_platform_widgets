@@ -1,3 +1,4 @@
+import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/cupertino.dart'
     show CupertinoActionSheet, CupertinoActionSheetAction;
 import 'package:flutter/material.dart'
@@ -11,37 +12,44 @@ import 'package:flutter/material.dart'
         PopupMenuItemBuilder,
         PopupMenuPosition,
         kMinInteractiveDimension;
-import 'package:flutter/widgets.dart';
 
-import 'platform.dart';
-import 'platform_widget.dart';
-import 'widget_base.dart';
+import 'package:flutter_extended_platform_widgets/src/platform.dart';
+import 'package:flutter_extended_platform_widgets/src/platform_widget.dart';
+import 'package:flutter_extended_platform_widgets/src/widget_base.dart';
 
-const double _kMenuDividerHeight = 16.0;
+const double _kMenuDividerHeight = 16;
 
 class PopupMenuOption {
-  final String? label;
-  final void Function(PopupMenuOption)? onTap;
-
-  final PlatformBuilder<CupertinoPopupMenuOptionData>? cupertino;
-  final PlatformBuilder<MaterialPopupMenuOptionData>? material;
-
-  PopupMenuOption({
+  const PopupMenuOption({
     this.label,
     this.onTap,
     this.cupertino,
     this.material,
+    this.windows,
+    this.macos,
+    this.linux,
+    this.fuchsia,
+    this.web,
   });
+  final String? label;
+  final void Function(PopupMenuOption)? onTap;
+
+  final PlatformBuilder<MaterialPopupMenuOptionData>? material;
+  final PlatformBuilder<CupertinoPopupMenuOptionData>? cupertino;
+  final PlatformBuilder<FluentPopupMenuOptionData>? windows;
+  final PlatformBuilder<CupertinoPopupMenuOptionData>? macos;
+  final PlatformBuilder<MaterialPopupMenuOptionData>? linux;
+  final PlatformBuilder<MaterialPopupMenuOptionData>? fuchsia;
+  final PlatformBuilder<MaterialPopupMenuOptionData>? web;
 }
 
 abstract class _BaseData {
-  final Key? key;
-  final Widget? child;
-
-  _BaseData({
+  const _BaseData({
     this.key,
     this.child,
   });
+  final Key? key;
+  final Widget? child;
 }
 
 class MaterialPopupMenuOptionData extends _BaseData {
@@ -68,13 +76,18 @@ class MaterialPopupMenuOptionData extends _BaseData {
     this.dividerHeight = _kMenuDividerHeight,
     this.labelTextStyle,
   });
+  final bool? enabled;
+  final double? height;
+  final MouseCursor? mouseCursor;
+  final VoidCallback? onTap;
+  final EdgeInsets? padding;
+  final TextStyle? textStyle;
+  final bool withDivider;
+  final double dividerHeight;
+  final MaterialStateProperty<TextStyle?>? labelTextStyle;
 }
 
 class CupertinoPopupMenuOptionData extends _BaseData {
-  final VoidCallback? onPressed;
-  final bool? isDefaultAction;
-  final bool? isDestructiveAction;
-
   CupertinoPopupMenuOptionData({
     super.key,
     super.child,
@@ -82,6 +95,32 @@ class CupertinoPopupMenuOptionData extends _BaseData {
     this.isDefaultAction,
     this.isDestructiveAction,
   });
+  final VoidCallback? onPressed;
+  final bool? isDefaultAction;
+  final bool? isDestructiveAction;
+}
+
+class FluentPopupMenuOptionData extends _BaseData {
+  const FluentPopupMenuOptionData({
+    super.key,
+    super.child,
+    this.enabled,
+    this.height,
+    this.mouseCursor,
+    this.onTap,
+    this.padding,
+    this.textStyle,
+    this.withDivider = false,
+    this.dividerHeight = _kMenuDividerHeight,
+  });
+  final bool? enabled;
+  final double? height;
+  final MouseCursor? mouseCursor;
+  final VoidCallback? onTap;
+  final EdgeInsets? padding;
+  final TextStyle? textStyle;
+  final bool withDivider;
+  final double dividerHeight;
 }
 
 class MaterialPopupMenuData {
@@ -141,14 +180,6 @@ class MaterialPopupMenuData {
 }
 
 class CupertinoPopupMenuData {
-  final Key? key;
-  final Widget? title;
-  final Widget? message;
-  final ScrollController? actionScrollController;
-  final ScrollController? messageScrollController;
-  final List<Widget>? actions;
-  final CupertinoPopupMenuCancelButtonData? cancelButtonData;
-
   CupertinoPopupMenuData({
     this.key,
     this.title,
@@ -158,15 +189,16 @@ class CupertinoPopupMenuData {
     this.actions,
     this.cancelButtonData,
   });
+  final Key? key;
+  final Widget? title;
+  final Widget? message;
+  final ScrollController? actionScrollController;
+  final ScrollController? messageScrollController;
+  final List<Widget>? actions;
+  final CupertinoPopupMenuCancelButtonData? cancelButtonData;
 }
 
 class CupertinoPopupMenuCancelButtonData {
-  final Key? key;
-  final Widget child;
-  final VoidCallback? onPressed;
-  final bool? isDefaultAction;
-  final bool? isDestructiveAction;
-
   CupertinoPopupMenuCancelButtonData({
     this.child = const Text('Cancel'),
     this.key,
@@ -174,79 +206,66 @@ class CupertinoPopupMenuCancelButtonData {
     this.isDefaultAction,
     this.isDestructiveAction,
   });
+  final Key? key;
+  final Widget child;
+  final VoidCallback? onPressed;
+  final bool? isDefaultAction;
+  final bool? isDestructiveAction;
+}
+
+class FluentPopupMenuData {
+  FluentPopupMenuData({
+    this.key,
+    this.icon,
+    this.elevation,
+    this.iconSize,
+    this.initialValue,
+  });
+  final Key? key;
+  final Widget? icon;
+  final double? elevation;
+  final double? iconSize;
+  final PopupMenuOption? initialValue;
 }
 
 class PlatformPopupMenu extends StatelessWidget {
-  final List<PopupMenuOption> options;
-  final Widget icon;
-
-  final PlatformBuilder<CupertinoPopupMenuData>? cupertino;
-  final PlatformBuilder<MaterialPopupMenuData>? material;
-
   const PlatformPopupMenu({
     required this.options,
     required this.icon,
-    this.cupertino,
     this.material,
+    this.cupertino,
+    this.windows,
+    this.macos,
+    this.linux,
+    this.fuchsia,
+    this.web,
     super.key,
   });
+  final List<PopupMenuOption> options;
+  final Widget icon;
+
+  final PlatformBuilder<MaterialPopupMenuData>? material;
+  final PlatformBuilder<CupertinoPopupMenuData>? cupertino;
+  final PlatformBuilder<FluentPopupMenuData>? windows;
+  final PlatformBuilder<CupertinoPopupMenuData>? macos;
+  final PlatformBuilder<CupertinoPopupMenuData>? linux;
+  final PlatformBuilder<MaterialPopupMenuData>? fuchsia;
+  final PlatformBuilder<CupertinoPopupMenuData>? web;
 
   @override
   Widget build(BuildContext context) {
     return PlatformWidget(
       material: (context, _) => _materialPopupMenuButton(context),
       cupertino: (context, _) => _cupertinoPopupBottomSheet(context),
-    );
-  }
-
-  Widget _cupertinoPopupBottomSheet(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        showPlatformModalSheet(
-          context: context,
-          builder: (context) => _cupertinoSheetContent(context),
-        );
-      },
-      child: icon,
-    );
-  }
-
-  Widget _cupertinoSheetContent(BuildContext context) {
-    final data = cupertino?.call(context, platform(context));
-    final cancelData = data?.cancelButtonData;
-
-    return CupertinoActionSheet(
-      key: data?.key ?? key,
-      title: data?.title,
-      message: data?.message,
-      actionScrollController: data?.actionScrollController,
-      messageScrollController: data?.messageScrollController,
-      actions: data?.actions ??
-          options.map(
-            (option) {
-              final data = option.cupertino?.call(context, platform(context));
-              return CupertinoActionSheetAction(
-                key: data?.key,
-                isDefaultAction: data?.isDefaultAction ?? false,
-                isDestructiveAction: data?.isDestructiveAction ?? false,
-                child: data?.child ?? Text(option.label ?? ""),
-                onPressed: data?.onPressed ??
-                    () {
-                      Navigator.pop(context);
-                      option.onTap?.call(option);
-                    },
-              );
-            },
-          ).toList(),
-      cancelButton: cancelData == null
-          ? null
-          : CupertinoActionSheetAction(
-              key: cancelData.key,
-              child: cancelData.child,
-              isDefaultAction: cancelData.isDefaultAction ?? false,
-              isDestructiveAction: cancelData.isDestructiveAction ?? false,
-              onPressed: cancelData.onPressed ?? () => Navigator.pop(context),
-            ),
+      windows: (_, __) => _FluentPopupMenuButton(
+        options: options,
+        data: windows?.call(context, platform(context)),
+        icon: icon,
+      ),
+      macos: (context, _) => _cupertinoPopupBottomSheet(context),
+      linux: (context, _) => _materialPopupMenuButton(context),
+      fuchsia: (context, _) => _materialPopupMenuButton(context),
+      web: (context, _) => _materialPopupMenuButton(context),
     );
   }
 
@@ -263,18 +282,20 @@ class PlatformPopupMenu extends StatelessWidget {
             final items = <PopupMenuEntry<PopupMenuOption>>[];
             for (final option in options) {
               final data = option.material?.call(context, platform(context));
-              items.add(PopupMenuItem<PopupMenuOption>(
-                value: option,
-                child: data?.child ?? Text(option.label ?? ""),
-                enabled: data?.enabled ?? true,
-                height: data?.height ?? kMinInteractiveDimension,
-                key: data?.key,
-                mouseCursor: data?.mouseCursor,
-                onTap: data?.onTap,
-                padding: data?.padding,
-                textStyle: data?.textStyle,
-                labelTextStyle: data?.labelTextStyle,
-              ));
+              items.add(
+                PopupMenuItem<PopupMenuOption>(
+                  value: option,
+                  enabled: data?.enabled ?? true,
+                  height: data?.height ?? kMinInteractiveDimension,
+                  key: data?.key,
+                  mouseCursor: data?.mouseCursor,
+                  onTap: data?.onTap,
+                  padding: data?.padding,
+                  textStyle: data?.textStyle,
+                  labelTextStyle: data?.labelTextStyle,
+                  child: data?.child ?? Text(option.label ?? ''),
+                ),
+              );
               if (data?.withDivider ?? false) {
                 items.add(
                   PopupMenuDivider(
@@ -310,4 +331,95 @@ class PlatformPopupMenu extends StatelessWidget {
       useRootNavigator: data?.useRootNavigator ?? false,
     );
   }
+
+  Widget _cupertinoPopupBottomSheet<T>(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        showPlatformModalSheet<T>(
+          context: context,
+          builder: _cupertinoSheetContent,
+        );
+      },
+      child: icon,
+    );
+  }
+
+  Widget _cupertinoSheetContent(BuildContext context) {
+    final data = cupertino?.call(context, platform(context));
+    final cancelData = data?.cancelButtonData;
+
+    return CupertinoActionSheet(
+      key: data?.key ?? key,
+      title: data?.title,
+      message: data?.message,
+      actionScrollController: data?.actionScrollController,
+      messageScrollController: data?.messageScrollController,
+      actions: data?.actions ??
+          options.map(
+            (option) {
+              final data = option.cupertino?.call(context, platform(context));
+              return CupertinoActionSheetAction(
+                key: data?.key,
+                isDefaultAction: data?.isDefaultAction ?? false,
+                isDestructiveAction: data?.isDestructiveAction ?? false,
+                onPressed: data?.onPressed ??
+                    () {
+                      Navigator.pop(context);
+                      option.onTap?.call(option);
+                    },
+                child: data?.child ?? Text(option.label ?? ''),
+              );
+            },
+          ).toList(),
+      cancelButton: cancelData == null
+          ? null
+          : CupertinoActionSheetAction(
+              key: cancelData.key,
+              isDefaultAction: cancelData.isDefaultAction ?? false,
+              isDestructiveAction: cancelData.isDestructiveAction ?? false,
+              onPressed: cancelData.onPressed ?? () => Navigator.pop(context),
+              child: cancelData.child,
+            ),
+    );
+  }
+}
+
+class _FluentPopupMenuButton extends StatelessWidget {
+  _FluentPopupMenuButton({
+    required this.options,
+    required this.data,
+    required this.icon,
+    super.key,
+  }) : _selectedValueNotifier =
+            ValueNotifier(data?.initialValue ?? options.first);
+
+  final FluentPopupMenuData? data;
+  final List<PopupMenuOption> options;
+
+  final Widget icon;
+
+  final ValueNotifier<PopupMenuOption> _selectedValueNotifier;
+
+  @override
+  Widget build(BuildContext context) => ValueListenableBuilder(
+        valueListenable: _selectedValueNotifier,
+        builder: (context, selectedValue, _) => ComboBox<PopupMenuOption>(
+          key: data?.key ?? key,
+          icon: data?.icon ?? icon,
+          value: _selectedValueNotifier.value,
+          onChanged: (option) => _selectedValueNotifier.value = option!,
+          elevation: data?.elevation?.toInt() ?? 8,
+          iconSize: data?.iconSize ?? 8.0,
+          items: [
+            for (final item in options)
+              ComboBoxItem(
+                value: item,
+                child: Text(item.label ?? ''),
+                onTap: () {
+                  if (item.onTap != null) item.onTap!(item);
+                },
+              ),
+          ],
+        ),
+      );
 }

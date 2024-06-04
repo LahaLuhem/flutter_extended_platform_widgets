@@ -1,34 +1,34 @@
+import 'package:fluent_ui/fluent_ui.dart' as fluent;
 import 'package:flutter/cupertino.dart'
     show CupertinoDatePicker, CupertinoDatePickerMode, DatePickerDateOrder;
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart'
     show
-        Theme,
-        showDatePicker,
-        SelectableDayPredicate,
         DatePickerEntryMode,
-        DatePickerMode;
+        DatePickerMode,
+        SelectableDayPredicate,
+        Theme,
+        showDatePicker;
 import 'package:flutter/widgets.dart';
-
-import 'platform.dart';
-import 'platform_text_button.dart';
-import 'widget_base.dart';
+import 'package:flutter_extended_platform_widgets/src/platform.dart';
+import 'package:flutter_extended_platform_widgets/src/platform_text_button.dart';
+import 'package:flutter_extended_platform_widgets/src/widget_base.dart';
 
 // Values derived from https://developer.apple.com/design/resources/ and on iOS
 // simulators with "Debug View Hierarchy".
 const double _kItemExtent = 32.0;
 
 class DatePickerContentData {
+  DatePickerContentData({
+    required this.selectedDate,
+    this.initialDate,
+    this.firstDate,
+    this.lastDate,
+  });
   final DateTime? initialDate;
   final DateTime? firstDate;
   final DateTime? lastDate;
   final DateTime selectedDate;
-
-  DatePickerContentData({
-    this.initialDate,
-    this.firstDate,
-    this.lastDate,
-    required this.selectedDate,
-  });
 }
 
 typedef DatePickerContentBuilder = Widget Function(
@@ -37,14 +37,14 @@ typedef DatePickerContentBuilder = Widget Function(
 );
 
 abstract class _BaseData {
-  final DateTime? initialDate;
-  final DateTime? firstDate;
-  final DateTime? lastDate;
   _BaseData({
     this.initialDate,
     this.firstDate,
     this.lastDate,
   });
+  final DateTime? initialDate;
+  final DateTime? firstDate;
+  final DateTime? lastDate;
 }
 
 class MaterialDatePickerData extends _BaseData {
@@ -139,6 +139,37 @@ class CupertinoDatePickerData extends _BaseData {
   final double? itemExtent;
 }
 
+class FluentDatePickerData extends _BaseData {
+  FluentDatePickerData({
+    this.key,
+    super.initialDate,
+    super.firstDate,
+    super.lastDate,
+    this.onDateTimeChanged,
+    this.minimumYear = 1,
+    this.maximumYear,
+    this.minuteInterval = 1,
+    this.use24hFormat = false,
+    this.dateOrder,
+    this.backgroundColor,
+    this.doneLabel,
+    this.cancelLabel,
+    this.showDayOfWeek,
+  });
+
+  final Key? key;
+  final int? minimumYear;
+  final int? maximumYear;
+  final int? minuteInterval;
+  final bool? use24hFormat;
+  final DatePickerDateOrder? dateOrder;
+  final ValueChanged<DateTime>? onDateTimeChanged;
+  final Color? backgroundColor;
+  final String? doneLabel;
+  final String? cancelLabel;
+  final bool? showDayOfWeek;
+}
+
 Future<DateTime?> showPlatformDatePicker({
   required BuildContext context,
   required DateTime initialDate,
@@ -146,6 +177,10 @@ Future<DateTime?> showPlatformDatePicker({
   required DateTime lastDate,
   PlatformBuilder<MaterialDatePickerData>? material,
   PlatformBuilder<CupertinoDatePickerData>? cupertino,
+  PlatformBuilder<CupertinoDatePickerData>? macos,
+  PlatformBuilder<MaterialDatePickerData>? linux,
+  PlatformBuilder<MaterialDatePickerData>? fuchsia,
+  PlatformBuilder<MaterialDatePickerData>? web,
   DatePickerContentBuilder? cupertinoContentBuilder,
 }) async {
   if (isMaterial(context)) {
@@ -180,7 +215,7 @@ Future<DateTime?> showPlatformDatePicker({
       barrierDismissible: data?.barrierDismissible ?? true,
       barrierLabel: data?.barrierLabel,
     );
-  } else {
+  } else if (isCupertino(context)) {
     final data = cupertino?.call(context, platform(context));
 
     final contentData = DatePickerContentData(
@@ -202,16 +237,123 @@ Future<DateTime?> showPlatformDatePicker({
             lastDate: lastDate,
           ),
     );
+  } else if (isMacos(context)) {
+    final data = macos?.call(context, platform(context));
+
+    final contentData = DatePickerContentData(
+      initialDate: data?.initialDate ?? initialDate,
+      firstDate: data?.firstDate ?? firstDate,
+      lastDate: data?.lastDate ?? lastDate,
+      selectedDate: data?.initialDate ?? initialDate,
+    );
+    return await _showDateModalBottomSheet<DateTime?>(
+      context,
+      cupertinoContentBuilder?.call(
+            contentData,
+            data,
+          ) ??
+          _renderManagedCupertinoDatePicker(
+            data: data,
+            initialDate: initialDate,
+            firstDate: firstDate,
+            lastDate: lastDate,
+          ),
+    );
+  } else if (isLinux(context)) {
+    final data = linux?.call(context, platform(context));
+    return await showDatePicker(
+      context: context,
+      initialDate: data?.initialDate ?? initialDate,
+      firstDate: data?.firstDate ?? firstDate,
+      lastDate: data?.lastDate ?? lastDate,
+      builder: data?.builder,
+      confirmText: data?.confirmText,
+      currentDate: data?.currentDate,
+      errorFormatText: data?.errorFormatText,
+      errorInvalidText: data?.errorInvalidText,
+      fieldHintText: data?.fieldHintText,
+      fieldLabelText: data?.fieldLabelText,
+      helpText: data?.helpText,
+      initialDatePickerMode: data?.initialDatePickerMode ?? DatePickerMode.day,
+      initialEntryMode: data?.initialEntryMode ?? DatePickerEntryMode.calendar,
+      locale: data?.locale,
+      routeSettings: data?.routeSettings,
+      selectableDayPredicate: data?.selectableDayPredicate,
+      textDirection: data?.textDirection,
+      useRootNavigator: data?.useRootNavigator ?? true,
+      cancelText: data?.cancelText,
+      anchorPoint: data?.anchorPoint,
+      keyboardType: data?.keyboardType,
+      onDatePickerModeChange: data?.onDatePickerModeChange,
+    );
+  } else if (isFuchsia(context)) {
+    final data = fuchsia?.call(context, platform(context));
+    return await showDatePicker(
+      context: context,
+      initialDate: data?.initialDate ?? initialDate,
+      firstDate: data?.firstDate ?? firstDate,
+      lastDate: data?.lastDate ?? lastDate,
+      builder: data?.builder,
+      confirmText: data?.confirmText,
+      currentDate: data?.currentDate,
+      errorFormatText: data?.errorFormatText,
+      errorInvalidText: data?.errorInvalidText,
+      fieldHintText: data?.fieldHintText,
+      fieldLabelText: data?.fieldLabelText,
+      helpText: data?.helpText,
+      initialDatePickerMode: data?.initialDatePickerMode ?? DatePickerMode.day,
+      initialEntryMode: data?.initialEntryMode ?? DatePickerEntryMode.calendar,
+      locale: data?.locale,
+      routeSettings: data?.routeSettings,
+      selectableDayPredicate: data?.selectableDayPredicate,
+      textDirection: data?.textDirection,
+      useRootNavigator: data?.useRootNavigator ?? true,
+      cancelText: data?.cancelText,
+      anchorPoint: data?.anchorPoint,
+      keyboardType: data?.keyboardType,
+      onDatePickerModeChange: data?.onDatePickerModeChange,
+    );
+  } else if (isWeb(context)) {
+    final data = web?.call(context, platform(context));
+    return await showDatePicker(
+      context: context,
+      initialDate: data?.initialDate ?? initialDate,
+      firstDate: data?.firstDate ?? firstDate,
+      lastDate: data?.lastDate ?? lastDate,
+      builder: data?.builder,
+      confirmText: data?.confirmText,
+      currentDate: data?.currentDate,
+      errorFormatText: data?.errorFormatText,
+      errorInvalidText: data?.errorInvalidText,
+      fieldHintText: data?.fieldHintText,
+      fieldLabelText: data?.fieldLabelText,
+      helpText: data?.helpText,
+      initialDatePickerMode: data?.initialDatePickerMode ?? DatePickerMode.day,
+      initialEntryMode: data?.initialEntryMode ?? DatePickerEntryMode.calendar,
+      locale: data?.locale,
+      routeSettings: data?.routeSettings,
+      selectableDayPredicate: data?.selectableDayPredicate,
+      textDirection: data?.textDirection,
+      useRootNavigator: data?.useRootNavigator ?? true,
+      cancelText: data?.cancelText,
+      anchorPoint: data?.anchorPoint,
+      keyboardType: data?.keyboardType,
+      onDatePickerModeChange: data?.onDatePickerModeChange,
+    );
+  } else {
+    return throw UnsupportedError(
+      'This platform is not supported: $defaultTargetPlatform',
+    );
   }
 }
 
 Widget _renderManagedCupertinoDatePicker({
-  CupertinoDatePickerData? data,
   required DateTime initialDate,
   required DateTime firstDate,
   required DateTime lastDate,
+  CupertinoDatePickerData? data,
 }) {
-  DateTime selectedDate = data?.initialDate ?? initialDate;
+  var selectedDate = data?.initialDate ?? initialDate;
 
   return StatefulBuilder(
     builder: (BuildContext context, StateSetter setState) {
@@ -232,15 +374,6 @@ Widget _renderManagedCupertinoDatePicker({
 }
 
 class DefaultCupertinoDatePicker extends StatelessWidget {
-  final double modalHeight;
-  final Color? modalColor;
-  final CupertinoDatePickerMode mode;
-  final DatePickerContentData contentData;
-  final ValueChanged<DateTime> onDateTimeChanged;
-  final CupertinoDatePickerData? data;
-  final String? doneLabel;
-  final String? cancelLabel;
-
   const DefaultCupertinoDatePicker({
     required this.contentData,
     required this.onDateTimeChanged,
@@ -252,6 +385,14 @@ class DefaultCupertinoDatePicker extends StatelessWidget {
     this.cancelLabel,
     super.key,
   });
+  final double modalHeight;
+  final Color? modalColor;
+  final CupertinoDatePickerMode mode;
+  final DatePickerContentData contentData;
+  final ValueChanged<DateTime> onDateTimeChanged;
+  final CupertinoDatePickerData? data;
+  final String? doneLabel;
+  final String? cancelLabel;
 
   @override
   Widget build(BuildContext context) {
@@ -298,6 +439,45 @@ class DefaultCupertinoDatePicker extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class FluentDatePicker extends StatefulWidget {
+  const FluentDatePicker({
+    required this.initialDate,
+    required this.firstDate,
+    required this.lastDate,
+    this.data,
+    super.key,
+  });
+
+  final FluentDatePickerData? data;
+  final DateTime initialDate, firstDate, lastDate;
+
+  @override
+  State<FluentDatePicker> createState() => _FluentDatePickerState();
+}
+
+class _FluentDatePickerState extends State<FluentDatePicker> {
+  _FluentDatePickerState({DateTime? selectedDate})
+      : selectedDate = selectedDate ?? DateTime.now();
+  DateTime selectedDate;
+
+  @override
+  Widget build(BuildContext context) {
+    // widget.data?.;
+    return fluent.DatePicker(
+      key: widget.data?.key,
+      selected: selectedDate,
+      startDate: widget.data?.firstDate ?? widget.firstDate,
+      endDate: widget.data?.lastDate ?? widget.lastDate,
+      onChanged: (newDate) {
+        if (widget.data?.onDateTimeChanged != null) {
+          widget.data?.onDateTimeChanged!(newDate);
+        }
+        setState(() => selectedDate = newDate);
+      },
     );
   }
 }

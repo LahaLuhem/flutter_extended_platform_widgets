@@ -5,7 +5,8 @@
  */
 
 import 'dart:ui' as ui show BoxHeightStyle, BoxWidthStyle;
-
+import 'package:fluent_ui/fluent_ui.dart'
+    show FluentTextSelectionToolbar, TextBox;
 import 'package:flutter/cupertino.dart'
     show
         CupertinoAdaptiveTextSelectionToolbar,
@@ -24,16 +25,15 @@ import 'package:flutter/material.dart'
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
-import 'platform.dart';
-import 'widget_base.dart';
+import 'package:flutter_extended_platform_widgets/src/platform.dart';
+import 'package:flutter_extended_platform_widgets/src/widget_base.dart';
 
 const BorderSide _kDefaultRoundedBorderSide = BorderSide(
   color: CupertinoDynamicColor.withBrightness(
     color: Color(0x33000000),
     darkColor: Color(0x33FFFFFF),
   ),
-  style: BorderStyle.solid,
-  width: 0.0,
+  width: 0,
 );
 
 const Border _kDefaultRoundedBorder = Border(
@@ -49,7 +49,7 @@ const BoxDecoration kDefaultRoundedBorderDecoration = BoxDecoration(
     darkColor: CupertinoColors.black,
   ),
   border: _kDefaultRoundedBorder,
-  borderRadius: BorderRadius.all(Radius.circular(5.0)),
+  borderRadius: BorderRadius.all(Radius.circular(5)),
 );
 
 abstract class _BaseData {
@@ -332,12 +332,87 @@ class CupertinoTextFieldData extends _BaseData {
   final String? clearButtonSemanticLabel;
 }
 
-class PlatformTextField
-    extends PlatformWidgetBase<CupertinoTextField, TextField> {
+class FluentTextFieldData extends _BaseData {
+  FluentTextFieldData({
+    super.widgetKey,
+    super.controller,
+    super.focusNode,
+    super.keyboardType,
+    super.textInputAction,
+    super.textCapitalization,
+    super.style,
+    super.textAlign,
+    super.textDirection,
+    super.autofocus,
+    super.obscureText,
+    super.autocorrect,
+    super.maxLines,
+    super.maxLength,
+    super.onChanged,
+    super.onEditingComplete,
+    super.onSubmitted,
+    super.inputFormatters,
+    super.enabled,
+    super.cursorWidth,
+    super.cursorRadius,
+    super.cursorColor,
+    super.keyboardAppearance,
+    super.scrollPadding,
+    super.enableInteractiveSelection,
+    super.onTap,
+    super.dragStartBehavior,
+    super.expands,
+    super.minLines,
+    super.scrollPhysics,
+    super.strutStyle,
+    super.scrollController,
+    super.readOnly,
+    super.showCursor,
+    super.textAlignVertical,
+    super.enableSuggestions,
+    super.smartDashesType,
+    super.smartQuotesType,
+    super.selectionHeightStyle,
+    super.selectionWidthStyle,
+    super.obscuringCharacter,
+    super.autofillHints,
+    super.cursorHeight,
+    super.restorationId,
+    super.maxLengthEnforcement,
+    super.selectionControls,
+    super.enableIMEPersonalizedLearning,
+    super.clipBehavior,
+    super.scribbleEnabled,
+    super.contextMenuBuilder,
+    super.onTapOutside,
+    super.spellCheckConfiguration,
+    super.magnifierConfiguration,
+    super.contentInsertionConfiguration,
+    super.cursorOpacityAnimates,
+    super.undoController,
+    this.decoration,
+  });
+
+  final BoxDecoration? decoration;
+}
+
+class PlatformTextField extends PlatformWidgetBase<
+    TextField,
+    CupertinoTextField,
+    TextBox,
+    CupertinoTextField,
+    TextField,
+    TextField,
+    TextField> {
   final Key? widgetKey;
 
   final PlatformBuilder<MaterialTextFieldData>? material;
   final PlatformBuilder<CupertinoTextFieldData>? cupertino;
+  final PlatformBuilder<FluentTextFieldData>? windows;
+  final PlatformBuilder<CupertinoTextFieldData>? macos;
+  final PlatformBuilder<MaterialTextFieldData>? linux;
+  final PlatformBuilder<MaterialTextFieldData>? fuchsia;
+  final PlatformBuilder<MaterialTextFieldData>? web;
 
   final TextEditingController? controller;
   final FocusNode? focusNode;
@@ -402,20 +477,30 @@ class PlatformTextField
   final UndoHistoryController? undoController;
 
   static Widget _defaultMaterialContextMenuBuilder(
-      BuildContext context, EditableTextState editableTextState) {
-    return AdaptiveTextSelectionToolbar.editableText(
-      editableTextState: editableTextState,
-    );
-  }
+    BuildContext context,
+    EditableTextState editableTextState,
+  ) =>
+      AdaptiveTextSelectionToolbar.editableText(
+        editableTextState: editableTextState,
+      );
 
   static Widget _defaultCupertinoContextMenuBuilder(
-      BuildContext context, EditableTextState editableTextState) {
-    return CupertinoAdaptiveTextSelectionToolbar.editableText(
-      editableTextState: editableTextState,
-    );
-  }
+    BuildContext context,
+    EditableTextState editableTextState,
+  ) =>
+      CupertinoAdaptiveTextSelectionToolbar.editableText(
+        editableTextState: editableTextState,
+      );
 
-  PlatformTextField({
+  static Widget _defaultFluentContextMenuBuilder(
+    BuildContext context,
+    EditableTextState editableTextState,
+  ) =>
+      FluentTextSelectionToolbar.editableText(
+        editableTextState: editableTextState,
+      );
+
+  const PlatformTextField({
     super.key,
     this.widgetKey,
     this.controller,
@@ -475,6 +560,11 @@ class PlatformTextField
     this.undoController,
     this.material,
     this.cupertino,
+    this.windows,
+    this.macos,
+    this.linux,
+    this.fuchsia,
+    this.web,
   }) : keyboardType = keyboardType ??
             (maxLines == 1 ? TextInputType.text : TextInputType.multiline);
 
@@ -590,7 +680,7 @@ class PlatformTextField
       cursorColor:
           data?.cursorColor ?? cursorColor ?? CupertinoColors.activeBlue,
       cursorRadius:
-          data?.cursorRadius ?? cursorRadius ?? const Radius.circular(2.0),
+          data?.cursorRadius ?? cursorRadius ?? const Radius.circular(2),
       cursorWidth: data?.cursorWidth ?? cursorWidth ?? 2.0,
       enabled: data?.enabled ?? enabled,
       focusNode: data?.focusNode ?? focusNode,
@@ -604,7 +694,7 @@ class PlatformTextField
       onEditingComplete: data?.onEditingComplete ?? onEditingComplete,
       onSubmitted: data?.onSubmitted ?? onSubmitted,
       scrollPadding:
-          data?.scrollPadding ?? scrollPadding ?? const EdgeInsets.all(20.0),
+          data?.scrollPadding ?? scrollPadding ?? const EdgeInsets.all(20),
       style: data?.style ?? style,
       textAlign: data?.textAlign ?? textAlign ?? TextAlign.start,
       textCapitalization: data?.textCapitalization ??
@@ -616,7 +706,7 @@ class PlatformTextField
               ? null
               : kDefaultRoundedBorderDecoration),
       clearButtonMode: data?.clearButtonMode ?? OverlayVisibilityMode.never,
-      padding: data?.padding ?? const EdgeInsets.all(6.0),
+      padding: data?.padding ?? const EdgeInsets.all(6),
       placeholder: data?.placeholder ?? hintText,
       placeholderStyle: data?.placeholderStyle ??
           const TextStyle(
@@ -680,6 +770,104 @@ class PlatformTextField
       // toolbarOptions: Deprecated
     );
   }
+
+  @override
+  TextBox createWindowsWidget(BuildContext context) {
+    final data = windows?.call(context, platform(context));
+
+    return TextBox(
+      key: data?.widgetKey ?? widgetKey,
+      placeholder: hintText,
+      autocorrect: data?.autocorrect ?? autocorrect ?? true,
+      autofocus: data?.autofocus ?? autofocus ?? false,
+      controller: data?.controller ?? controller,
+      cursorColor: data?.cursorColor ?? cursorColor,
+      cursorRadius:
+          data?.cursorRadius ?? cursorRadius ?? const Radius.circular(2),
+      cursorWidth: data?.cursorWidth ?? cursorWidth ?? 2.0,
+      enabled: data?.enabled ?? enabled,
+      focusNode: data?.focusNode ?? focusNode,
+      inputFormatters: data?.inputFormatters ?? inputFormatters,
+      keyboardAppearance: data?.keyboardAppearance ?? keyboardAppearance,
+      keyboardType: data?.keyboardType ?? keyboardType,
+      maxLength: data?.maxLength ?? maxLength,
+      maxLines: data?.maxLines ?? maxLines,
+      obscureText: data?.obscureText ?? obscureText ?? false,
+      onChanged: data?.onChanged ?? onChanged,
+      onEditingComplete: data?.onEditingComplete ?? onEditingComplete,
+      onSubmitted: data?.onSubmitted ?? onSubmitted,
+      scrollPadding:
+          data?.scrollPadding ?? scrollPadding ?? const EdgeInsets.all(20),
+      style: data?.style ?? style,
+      textAlign: data?.textAlign ?? textAlign ?? TextAlign.start,
+      textCapitalization: data?.textCapitalization ??
+          textCapitalization ??
+          TextCapitalization.none,
+      textInputAction: data?.textInputAction ?? textInputAction,
+      decoration: data?.decoration,
+      textDirection: data?.textDirection,
+      dragStartBehavior: data?.dragStartBehavior ??
+          dragStartBehavior ??
+          DragStartBehavior.start,
+      expands: data?.expands ?? expands ?? false,
+      minLines: data?.minLines ?? minLines,
+      scrollPhysics: data?.scrollPhysics ?? scrollPhysics,
+      strutStyle: data?.strutStyle ?? strutStyle,
+      enableInteractiveSelection: data?.enableInteractiveSelection ??
+          enableInteractiveSelection ??
+          true,
+      scrollController: data?.scrollController ?? scrollController,
+      onTap: data?.onTap ?? onTap,
+      readOnly: data?.readOnly ?? readOnly ?? false,
+      showCursor: data?.showCursor ?? showCursor,
+      textAlignVertical: data?.textAlignVertical ?? textAlignVertical,
+      enableSuggestions: data?.enableSuggestions ?? true,
+      smartQuotesType: data?.smartQuotesType ?? smartQuotesType,
+      smartDashesType: data?.smartDashesType ?? smartDashesType,
+      selectionHeightStyle: data?.selectionHeightStyle ??
+          selectionHeightStyle ??
+          ui.BoxHeightStyle.tight,
+      selectionWidthStyle: data?.selectionWidthStyle ??
+          selectionWidthStyle ??
+          ui.BoxWidthStyle.tight,
+      obscuringCharacter: data?.obscuringCharacter ?? obscuringCharacter ?? '•',
+      autofillHints: data?.autofillHints ?? autofillHints,
+      cursorHeight: data?.cursorHeight ?? cursorHeight,
+      restorationId: data?.restorationId ?? restorationId,
+      maxLengthEnforcement: data?.maxLengthEnforcement ?? maxLengthEnforcement,
+      selectionControls: data?.selectionControls ?? selectionControls,
+      enableIMEPersonalizedLearning: data?.enableIMEPersonalizedLearning ??
+          enableIMEPersonalizedLearning ??
+          true,
+      clipBehavior: data?.clipBehavior ?? clipBehavior,
+      scribbleEnabled: data?.scribbleEnabled ?? scribbleEnabled,
+      contextMenuBuilder: data?.contextMenuBuilder ??
+          contextMenuBuilder ??
+          _defaultFluentContextMenuBuilder,
+      onTapOutside: data?.onTapOutside ?? onTapOutside,
+      spellCheckConfiguration:
+          data?.spellCheckConfiguration ?? spellCheckConfiguration,
+      magnifierConfiguration:
+          data?.magnifierConfiguration ?? magnifierConfiguration,
+    );
+  }
+
+  //Todo(mehul): change themes here
+  @override
+  CupertinoTextField createMacosWidget(BuildContext context) =>
+      createCupertinoWidget(context);
+
+  @override
+  TextField createLinuxWidget(BuildContext context) =>
+      createMaterialWidget(context);
+
+  @override
+  TextField createFuchsiaWidget(BuildContext context) =>
+      createMaterialWidget(context);
+
+  @override
+  TextField createWebWidget(BuildContext context) =>
+      createMaterialWidget(context);
 
   InputDecoration _inputDecorationWithHint(
     String hintText,

@@ -4,6 +4,7 @@
  * See LICENSE for distribution and usage details.
  */
 
+import 'package:fluent_ui/fluent_ui.dart' as fluent;
 import 'package:flutter/cupertino.dart' show CupertinoDialogAction;
 import 'package:flutter/material.dart'
     show
@@ -16,8 +17,8 @@ import 'package:flutter/material.dart'
         VisualDensity;
 import 'package:flutter/widgets.dart';
 
-import 'platform.dart';
-import 'widget_base.dart';
+import 'package:flutter_extended_platform_widgets/src/platform.dart';
+import 'package:flutter_extended_platform_widgets/src/widget_base.dart';
 
 abstract class _BaseData {
   _BaseData({
@@ -128,24 +129,53 @@ class CupertinoDialogActionData extends _BaseData {
   final TextStyle? textStyle;
 }
 
-class PlatformDialogAction
-    extends PlatformWidgetBase<CupertinoDialogAction, Widget> {
-  final Key? widgetKey;
-  final Widget? child;
-  final void Function()? onPressed;
+class FluentDialogActionData extends _BaseData {
+  FluentDialogActionData({
+    super.child,
+    super.onPressed,
+    super.widgetKey,
+    this.isDefaultAction,
+    this.isDestructiveAction,
+    this.style,
+  });
 
-  final PlatformBuilder<MaterialDialogActionData>? material;
+  final bool? isDefaultAction;
+  final bool? isDestructiveAction;
+  final fluent.ButtonStyle? style;
+}
 
-  final PlatformBuilder<CupertinoDialogActionData>? cupertino;
-
-  PlatformDialogAction({
+class PlatformDialogAction extends PlatformWidgetBase<
+    Widget,
+    CupertinoDialogAction,
+    fluent.Button,
+    CupertinoDialogAction,
+    Widget,
+    Widget,
+    Widget> {
+  const PlatformDialogAction({
     super.key,
     this.widgetKey,
     this.child,
     this.onPressed,
     this.material,
     this.cupertino,
+    this.windows,
+    this.macos,
+    this.linux,
+    this.fuchsia,
+    this.web,
   });
+  final Key? widgetKey;
+  final Widget? child;
+  final void Function()? onPressed;
+
+  final PlatformBuilder<MaterialDialogActionData>? material;
+  final PlatformBuilder<CupertinoDialogActionData>? cupertino;
+  final PlatformBuilder<FluentDialogActionData>? windows;
+  final PlatformBuilder<CupertinoDialogActionData>? macos;
+  final PlatformBuilder<MaterialDialogActionData>? linux;
+  final PlatformBuilder<MaterialDialogActionData>? fuchsia;
+  final PlatformBuilder<MaterialDialogActionData>? web;
 
   @override
   Widget createMaterialWidget(BuildContext context) {
@@ -174,7 +204,6 @@ class PlatformDialogAction
 
     return TextButton(
       key: data?.widgetKey ?? widgetKey,
-      child: data?.child ?? child!,
       onPressed: data?.onPressed ?? onPressed,
       onLongPress: data?.onLongPress,
       autofocus: data?.autofocus ?? false,
@@ -185,6 +214,7 @@ class PlatformDialogAction
       onHover: data?.onHover,
       statesController: data?.statesController,
       isSemanticButton: data?.isSemanticButton ?? true,
+      child: data?.child ?? child!,
     );
   }
 
@@ -196,11 +226,41 @@ class PlatformDialogAction
 
     return CupertinoDialogAction(
       key: data?.widgetKey ?? widgetKey,
-      child: data?.child ?? child!,
       isDefaultAction: data?.isDefaultAction ?? false,
       isDestructiveAction: data?.isDestructiveAction ?? false,
       onPressed: data?.onPressed ?? onPressed,
       textStyle: data?.textStyle,
+      child: data?.child ?? child!,
     );
   }
+
+  @override
+  fluent.Button createWindowsWidget(BuildContext context) {
+    final data = windows?.call(context, platform(context));
+
+    assert(data?.child != null || child != null);
+
+    return fluent.Button(
+      key: data?.widgetKey ?? widgetKey,
+      style: data?.style,
+      onPressed: data?.onPressed ?? onPressed,
+      child: data?.child ?? child!,
+    );
+  }
+
+  //Todo(mehul): change themes here
+  @override
+  CupertinoDialogAction createMacosWidget(BuildContext context) =>
+      createCupertinoWidget(context);
+
+  @override
+  Widget createLinuxWidget(BuildContext context) =>
+      createMaterialWidget(context);
+
+  @override
+  Widget createFuchsiaWidget(BuildContext context) =>
+      createMaterialWidget(context);
+
+  @override
+  Widget createWebWidget(BuildContext context) => createMaterialWidget(context);
 }

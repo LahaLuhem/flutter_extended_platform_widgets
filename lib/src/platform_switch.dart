@@ -9,6 +9,9 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart'
     show WidgetStateProperty, MaterialTapTargetSize, Switch;
 import 'package:flutter/widgets.dart';
+import 'package:fluent_ui/fluent_ui.dart' show ToggleSwitch;
+import 'package:flutter_extended_platform_widgets/src/extensions/macos_color_extensions.dart';
+import 'package:macos_ui/macos_ui.dart' show MacosColor, MacosSwitch;
 
 import 'platform.dart';
 import 'widget_base.dart';
@@ -111,7 +114,20 @@ class CupertinoSwitchData extends _BaseData {
   final Color? onLabelColor;
 }
 
-class PlatformSwitch extends PlatformWidgetBase<CupertinoSwitch, Switch> {
+class FluentSwitchData extends _BaseData {
+  FluentSwitchData({
+    super.widgetKey,
+    super.value,
+    super.onChanged,
+    super.activeColor,
+    super.dragStartBehavior,
+    super.focusNode,
+    super.autofocus,
+  });
+}
+
+class PlatformSwitch extends PlatformWidgetBase<Switch, CupertinoSwitch,
+    ToggleSwitch, MacosSwitch, Switch, Switch, Switch> {
   final Key? widgetKey;
 
   final bool value;
@@ -124,8 +140,13 @@ class PlatformSwitch extends PlatformWidgetBase<CupertinoSwitch, Switch> {
 
   final PlatformBuilder<MaterialSwitchData>? material;
   final PlatformBuilder<CupertinoSwitchData>? cupertino;
+  final PlatformBuilder<FluentSwitchData>? windows;
+  final PlatformBuilder<CupertinoSwitchData>? macos;
+  final PlatformBuilder<MaterialSwitchData>? linux;
+  final PlatformBuilder<MaterialSwitchData>? fuchsia;
+  final PlatformBuilder<MaterialSwitchData>? web;
 
-  PlatformSwitch({
+  const PlatformSwitch({
     super.key,
     this.widgetKey,
     required this.value,
@@ -137,6 +158,11 @@ class PlatformSwitch extends PlatformWidgetBase<CupertinoSwitch, Switch> {
     this.onFocusChange,
     this.material,
     this.cupertino,
+    this.windows,
+    this.macos,
+    this.linux,
+    this.web,
+    this.fuchsia,
   });
 
   @override
@@ -198,4 +224,45 @@ class PlatformSwitch extends PlatformWidgetBase<CupertinoSwitch, Switch> {
       onLabelColor: data?.onLabelColor,
     );
   }
+
+  @override
+  ToggleSwitch createWindowsWidget(BuildContext context) {
+    final data = windows?.call(context, platform(context));
+
+    return ToggleSwitch(
+      key: data?.widgetKey ?? widgetKey,
+      checked: data?.value ?? value,
+      onChanged: data?.onChanged ?? onChanged,
+      autofocus: data?.autofocus ?? autofocus ?? false,
+      focusNode: data?.focusNode ?? focusNode,
+    );
+  }
+
+  @override
+  MacosSwitch createMacosWidget(BuildContext context) {
+    final data = macos?.call(context, platform(context));
+
+    return MacosSwitch(
+      key: data?.widgetKey ?? widgetKey,
+      value: data?.value ?? value,
+      onChanged: data?.onChanged ?? onChanged,
+      activeColor: (data?.activeColor ?? activeColor)?.toMacosColor(),
+      dragStartBehavior: data?.dragStartBehavior ??
+          dragStartBehavior ??
+          DragStartBehavior.start,
+      trackColor: data?.trackColor?.toMacosColor(),
+      knobColor: data?.thumbColor?.toMacosColor(),
+    );
+  }
+
+  @override
+  Switch createLinuxWidget(BuildContext context) =>
+      createMaterialWidget(context);
+
+  @override
+  Switch createWebWidget(BuildContext context) => createMaterialWidget(context);
+
+  @override
+  Switch createFuchsiaWidget(BuildContext context) =>
+      createMaterialWidget(context);
 }

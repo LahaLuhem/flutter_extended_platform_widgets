@@ -7,9 +7,14 @@
 
 ![Pub](https://img.shields.io/pub/v/flutter_platform_widgets) ![GitHub](https://img.shields.io/github/license/stryder-dev/flutter_platform_widgets)
 
+### Reason for fork
+This is a fork package of the original [flutter_platform_widgets](https://pub.dev/packages/flutter_platform_widgets) package.
+With a fork, one can keep up to date with the developments happening in the original, while adding this missing support for the lesser-used platforms too.
+It now supports builders of the remaining Flutter-supported Windows, MacOS, Linux, Fuchsia, and Web platforms too. This is something that would not be added in the original plugin.
+
 <!-- omit in toc -->
 ### TL;DR;
-A wrapper library that makes it easier to target the design language of your chosen platform using a single widget.
+A wrapper library that makes it easier to target the design language of your chosen platform using a single widget.<br>
 
 <!-- omit in toc -->
 ### Bit more
@@ -17,7 +22,7 @@ For anyone that starts with building apps with Flutter it becomes clear that pic
 
 This project was initially an experiment which grew into a fully fledged package to support the look using the Material and Cupertino designed widgets with a single platform widget.
 
-If you want to build a Material and Cupertino looking app with very similar functionality then this package could save you time and effort.
+If you want to build a native looking app with very similar functionality then this package could save you time and effort.
 
 ---
 

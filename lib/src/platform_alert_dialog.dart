@@ -4,17 +4,19 @@
  * See LICENSE for distribution and usage details.
  */
 
+import 'package:fluent_ui/fluent_ui.dart'
+    show ContentDialog, ContentDialogThemeData, FlyoutController, FlyoutTarget;
 import 'package:flutter/cupertino.dart' show CupertinoAlertDialog;
 import 'package:flutter/material.dart' show AlertDialog, Material;
 import 'package:flutter/widgets.dart';
-import 'package:flutter_platform_widgets/src/extensions.dart';
+import 'package:flutter_extended_platform_widgets/src/extensions.dart';
 
-import 'platform.dart';
-import 'platform_provider.dart';
-import 'widget_base.dart';
+import 'package:flutter_extended_platform_widgets/src/platform.dart';
+import 'package:flutter_extended_platform_widgets/src/platform_provider.dart';
+import 'package:flutter_extended_platform_widgets/src/widget_base.dart';
 
 const EdgeInsets _defaultInsetPadding =
-    EdgeInsets.symmetric(horizontal: 40.0, vertical: 24.0);
+    EdgeInsets.symmetric(horizontal: 40, vertical: 24);
 
 abstract class _BaseData {
   _BaseData({
@@ -104,16 +106,22 @@ class CupertinoAlertDialogData extends _BaseData {
   final Duration? insetAnimationDuration;
 }
 
-class PlatformAlertDialog extends PlatformWidgetBase<Widget, AlertDialog> {
-  final Key? widgetKey;
-  final List<Widget>? actions;
-  final Widget? content;
-  final Widget? title;
+class FluentAlertDialogData extends _BaseData {
+  FluentAlertDialogData({
+    super.widgetKey,
+    super.actions,
+    super.content,
+    super.title,
+    this.contentDialogThemeData,
+  });
 
-  final PlatformBuilder<MaterialAlertDialogData>? material;
-  final PlatformBuilder<CupertinoAlertDialogData>? cupertino;
+  final ContentDialogThemeData? contentDialogThemeData;
+}
 
-  PlatformAlertDialog({
+//Todo(mehul): change themes here
+class PlatformAlertDialog extends PlatformWidgetBase<AlertDialog, Widget,
+    FlyoutTarget, Widget, AlertDialog, AlertDialog, AlertDialog> {
+  const PlatformAlertDialog({
     super.key,
     this.widgetKey,
     this.actions,
@@ -121,7 +129,24 @@ class PlatformAlertDialog extends PlatformWidgetBase<Widget, AlertDialog> {
     this.title,
     this.material,
     this.cupertino,
+    this.windows,
+    this.macos,
+    this.linux,
+    this.fuchsia,
+    this.web,
   });
+  final Key? widgetKey;
+  final List<Widget>? actions;
+  final Widget? content;
+  final Widget? title;
+
+  final PlatformBuilder<MaterialAlertDialogData>? material;
+  final PlatformBuilder<CupertinoAlertDialogData>? cupertino;
+  final PlatformBuilder<FluentAlertDialogData>? windows;
+  final PlatformBuilder<CupertinoAlertDialogData>? macos;
+  final PlatformBuilder<MaterialAlertDialogData>? linux;
+  final PlatformBuilder<MaterialAlertDialogData>? fuchsia;
+  final PlatformBuilder<MaterialAlertDialogData>? web;
 
   @override
   AlertDialog createMaterialWidget(BuildContext context) {
@@ -162,7 +187,7 @@ class PlatformAlertDialog extends PlatformWidgetBase<Widget, AlertDialog> {
   Widget createCupertinoWidget(BuildContext context) {
     final data = cupertino?.call(context, platform(context));
 
-    Curve? curve = data?.insetAnimationCurve;
+    final curve = data?.insetAnimationCurve;
 
     final providerState = PlatformProvider.of(context);
     final useLegacyMaterial =
@@ -178,12 +203,47 @@ class PlatformAlertDialog extends PlatformWidgetBase<Widget, AlertDialog> {
       title: data?.title ?? title,
       insetAnimationCurve: curve ?? Curves.decelerate,
       insetAnimationDuration:
-          data?.insetAnimationDuration ?? Duration(milliseconds: 100),
+          data?.insetAnimationDuration ?? const Duration(milliseconds: 100),
     );
 
     // Ensure that there is Material widget at the root page level
     // as there can be Material widgets used on ios
-    return result.withMaterial(useLegacyMaterial &&
-        context.findAncestorWidgetOfExactType<Material>() == null);
+    return result.withMaterial(
+      useLegacyMaterial &&
+          context.findAncestorWidgetOfExactType<Material>() == null,
+    );
   }
+
+  @override
+  FlyoutTarget createWindowsWidget(BuildContext context) {
+    final data = windows?.call(context, platform(context));
+
+    return FlyoutTarget(
+      key: data?.widgetKey ?? widgetKey,
+      controller: FlyoutController(),
+      child: ContentDialog(
+        title: data?.title ?? title,
+        actions: data?.actions ?? actions,
+        content: data?.content ?? content,
+        style: data?.contentDialogThemeData,
+      ),
+    );
+  }
+
+  //Todo(mehul): change themes here
+  @override
+  Widget createMacosWidget(BuildContext context) =>
+      createCupertinoWidget(context);
+
+  @override
+  AlertDialog createLinuxWidget(BuildContext context) =>
+      createMaterialWidget(context);
+
+  @override
+  AlertDialog createFuchsiaWidget(BuildContext context) =>
+      createMaterialWidget(context);
+
+  @override
+  AlertDialog createWebWidget(BuildContext context) =>
+      createMaterialWidget(context);
 }

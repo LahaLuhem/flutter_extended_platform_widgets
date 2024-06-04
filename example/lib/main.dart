@@ -1,6 +1,7 @@
+import 'package:fluent_ui/l10n/generated/fluent_localizations.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'package:flutter_extended_platform_widgets/flutter_extended_platform_widgets.dart';
 
 import 'platform_page.dart.dart';
 
@@ -64,6 +65,7 @@ class _MyAppState extends State<MyApp> {
             DefaultMaterialLocalizations.delegate,
             DefaultWidgetsLocalizations.delegate,
             DefaultCupertinoLocalizations.delegate,
+            ...FluentLocalizations.localizationsDelegates,
           ],
           title: 'Flutter Platform Widgets',
           home: PlatformPage(),

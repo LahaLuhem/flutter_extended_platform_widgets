@@ -4,15 +4,16 @@
  * See LICENSE for distribution and usage details.
  */
 
+import 'package:fluent_ui/fluent_ui.dart' as fluent;
 import 'package:flutter/cupertino.dart' show CupertinoListTile;
 import 'package:flutter/material.dart'
     show ListTile, ListTileStyle, ListTileTitleAlignment, VisualDensity;
 import 'package:flutter/widgets.dart';
-import 'platform.dart';
-import 'widget_base.dart';
+import 'package:flutter_extended_platform_widgets/src/platform.dart';
+import 'package:flutter_extended_platform_widgets/src/widget_base.dart';
 
-const double _kLeadingSize = 28.0;
-const double _kLeadingToTitle = 16.0;
+const double _kLeadingSize = 28;
+const double _kLeadingToTitle = 16;
 
 abstract class _BaseData {
   _BaseData({
@@ -126,7 +127,41 @@ class CupertinoListTileData extends _BaseData {
   Widget? additionalInfo;
 }
 
-class PlatformListTile extends PlatformWidgetBase<CupertinoListTile, ListTile> {
+class FluentListTileData extends _BaseData {
+  FluentListTileData({
+    super.key,
+    super.leading,
+    super.title,
+    super.subtitle,
+    super.trailing,
+    super.onTap,
+    this.shape,
+    this.autofocus,
+    this.tileColor,
+  });
+
+  final ShapeBorder? shape;
+  final bool? autofocus;
+  final fluent.ButtonState<Color>? tileColor;
+}
+
+class PlatformListTile extends PlatformWidgetBase<ListTile, CupertinoListTile,
+    fluent.ListTile, CupertinoListTile, ListTile, ListTile, ListTile> {
+  const PlatformListTile({
+    required this.title,
+    this.leading,
+    this.subtitle,
+    this.trailing,
+    this.onTap,
+    this.material,
+    this.cupertino,
+    this.windows,
+    this.macos,
+    this.linux,
+    this.fuchsia,
+    this.web,
+    super.key,
+  });
   final Widget? leading;
   final Widget title;
   final Widget? subtitle;
@@ -136,17 +171,11 @@ class PlatformListTile extends PlatformWidgetBase<CupertinoListTile, ListTile> {
 
   final PlatformBuilder<MaterialListTileData>? material;
   final PlatformBuilder<CupertinoListTileData>? cupertino;
-
-  PlatformListTile({
-    required this.title,
-    this.leading,
-    this.subtitle,
-    this.trailing,
-    this.onTap,
-    this.material,
-    this.cupertino,
-    super.key,
-  });
+  final PlatformBuilder<FluentListTileData>? windows;
+  final PlatformBuilder<CupertinoListTileData>? macos;
+  final PlatformBuilder<MaterialListTileData>? linux;
+  final PlatformBuilder<MaterialListTileData>? fuchsia;
+  final PlatformBuilder<MaterialListTileData>? web;
 
   @override
   ListTile createMaterialWidget(BuildContext context) {
@@ -210,4 +239,37 @@ class PlatformListTile extends PlatformWidgetBase<CupertinoListTile, ListTile> {
       padding: data?.padding,
     );
   }
+
+  @override
+  fluent.ListTile createWindowsWidget(BuildContext context) {
+    final data = windows?.call(context, platform(context));
+
+    return fluent.ListTile(
+      key: data?.key ?? key,
+      leading: data?.leading ?? leading,
+      title: data?.title ?? title,
+      subtitle: data?.subtitle ?? subtitle,
+      trailing: data?.trailing ?? trailing,
+      autofocus: data?.autofocus ?? false,
+      shape: data?.shape ?? fluent.kDefaultListTileShape,
+      tileColor: data?.tileColor,
+    );
+  }
+
+  //Todo(mehul): change themes here
+  @override
+  CupertinoListTile createMacosWidget(BuildContext context) =>
+      createCupertinoWidget(context);
+
+  @override
+  ListTile createLinuxWidget(BuildContext context) =>
+      createMaterialWidget(context);
+
+  @override
+  ListTile createFuchsiaWidget(BuildContext context) =>
+      createMaterialWidget(context);
+
+  @override
+  ListTile createWebWidget(BuildContext context) =>
+      createMaterialWidget(context);
 }

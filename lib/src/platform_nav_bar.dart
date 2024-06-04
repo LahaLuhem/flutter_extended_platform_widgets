@@ -4,7 +4,8 @@
  * See LICENSE for distribution and usage details.
  */
 
-import 'package:flutter/cupertino.dart' show CupertinoTabBar, CupertinoColors;
+import 'package:fluent_ui/fluent_ui.dart' show Tab, TabView;
+import 'package:flutter/cupertino.dart' show CupertinoColors, CupertinoTabBar;
 import 'package:flutter/material.dart'
     show
         BottomAppBar,
@@ -18,11 +19,11 @@ import 'package:flutter/material.dart'
         Theme;
 import 'package:flutter/widgets.dart';
 
-import 'platform.dart';
-import 'widget_base.dart';
+import 'package:flutter_extended_platform_widgets/src/platform.dart';
+import 'package:flutter_extended_platform_widgets/src/widget_base.dart';
 
 // Standard iOS 10 tab bar height.
-const double _kTabBarHeight = 50.0;
+const double _kTabBarHeight = 50;
 const Color _kDefaultTabBarBorderColor = Color(0x4C000000);
 const Color _kDefaultTabBarInactiveColor = CupertinoColors.inactiveGray;
 
@@ -46,24 +47,6 @@ abstract class _BaseData {
   final int? currentIndex;
   final void Function(int)? itemChanged;
   final double? height;
-}
-
-class CupertinoTabBarData extends _BaseData {
-  CupertinoTabBarData({
-    super.backgroundColor,
-    super.items,
-    super.activeColor,
-    super.widgetKey,
-    super.itemChanged,
-    super.iconSize,
-    super.currentIndex,
-    super.height,
-    this.inactiveColor,
-    this.border,
-  });
-
-  final Color? inactiveColor;
-  final Border? border;
 }
 
 class MaterialNavigationBarData {
@@ -160,7 +143,99 @@ class MaterialNavBarData extends _BaseData {
   final Color? shadowColor;
 }
 
-class PlatformNavBar extends PlatformWidgetBase<CupertinoTabBar, Widget> {
+class CupertinoTabBarData extends _BaseData {
+  CupertinoTabBarData({
+    super.backgroundColor,
+    super.items,
+    super.activeColor,
+    super.widgetKey,
+    super.itemChanged,
+    super.iconSize,
+    super.currentIndex,
+    super.height,
+    this.inactiveColor,
+    this.border,
+  });
+
+  final Color? inactiveColor;
+  final Border? border;
+}
+
+class FluentTabBarData extends _BaseData {
+  FluentTabBarData({
+    super.items,
+    super.backgroundColor,
+    super.iconSize,
+    this.elevation,
+    Color? fixedColor,
+    super.widgetKey,
+    super.itemChanged,
+    super.currentIndex,
+    super.height,
+    this.navigationBarKey,
+    this.shape,
+    this.clipBehavior,
+    this.notchMargin,
+    this.selectedFontSize,
+    this.selectedItemColor,
+    this.showSelectedLabels,
+    this.showUnselectedLabels,
+    this.unselectedFontSize,
+    this.unselectedItemColor,
+    this.selectedIconTheme,
+    this.selectedLabelStyle,
+    this.unselectedIconTheme,
+    this.unselectedLabelStyle,
+    this.mouseCursor,
+    this.enableFeedback,
+    this.useLegacyColorScheme = true,
+    this.padding,
+    this.surfaceTintColor,
+    this.shadowColor,
+  }) : super(activeColor: fixedColor);
+
+  final double? selectedFontSize;
+  final double? elevation;
+  final Key? navigationBarKey;
+  final NotchedShape? shape;
+  final Clip? clipBehavior;
+  final double? notchMargin;
+  final Color? selectedItemColor;
+  final bool? showSelectedLabels;
+  final bool? showUnselectedLabels;
+  final double? unselectedFontSize;
+  final Color? unselectedItemColor;
+  final IconThemeData? selectedIconTheme;
+  final TextStyle? selectedLabelStyle;
+  final IconThemeData? unselectedIconTheme;
+  final TextStyle? unselectedLabelStyle;
+  final MouseCursor? mouseCursor;
+  final bool? enableFeedback;
+  final bool useLegacyColorScheme;
+  final EdgeInsetsGeometry? padding;
+  final Color? surfaceTintColor;
+  final Color? shadowColor;
+}
+
+class PlatformNavBar extends PlatformWidgetBase<Widget, CupertinoTabBar,
+    TabView, CupertinoTabBar, Widget, Widget, Widget> {
+  const PlatformNavBar({
+    super.key,
+    this.widgetKey,
+    this.backgroundColor,
+    this.items,
+    this.itemChanged,
+    this.currentIndex,
+    this.height,
+    this.material,
+    this.material3,
+    this.cupertino,
+    this.windows,
+    this.macos,
+    this.linux,
+    this.fuchsia,
+    this.web,
+  });
   final Key? widgetKey;
   final Color? backgroundColor;
 
@@ -172,19 +247,11 @@ class PlatformNavBar extends PlatformWidgetBase<CupertinoTabBar, Widget> {
   final PlatformBuilder<MaterialNavBarData>? material;
   final PlatformBuilder<MaterialNavigationBarData>? material3;
   final PlatformBuilder<CupertinoTabBarData>? cupertino;
-
-  PlatformNavBar({
-    super.key,
-    this.widgetKey,
-    this.backgroundColor,
-    this.items,
-    this.itemChanged,
-    this.currentIndex,
-    this.height,
-    this.material,
-    this.material3,
-    this.cupertino,
-  });
+  final PlatformBuilder<FluentTabBarData>? windows;
+  final PlatformBuilder<CupertinoTabBarData>? macos;
+  final PlatformBuilder<MaterialNavBarData>? linux;
+  final PlatformBuilder<MaterialNavBarData>? fuchsia;
+  final PlatformBuilder<MaterialNavBarData>? web;
 
   @override
   Widget createMaterialWidget(BuildContext context) {
@@ -234,7 +301,7 @@ class PlatformNavBar extends PlatformWidgetBase<CupertinoTabBar, Widget> {
   Widget _createMaterial2Widget(BuildContext context) {
     final data = material?.call(context, platform(context));
 
-    var bar = BottomNavigationBar(
+    final bar = BottomNavigationBar(
       items: data?.items ?? items ?? const <BottomNavigationBarItem>[],
       currentIndex: data?.currentIndex ?? currentIndex ?? 0,
       onTap: data?.itemChanged ?? itemChanged,
@@ -261,7 +328,6 @@ class PlatformNavBar extends PlatformWidgetBase<CupertinoTabBar, Widget> {
     );
 
     return BottomAppBar(
-      child: bar,
       color: data?.backgroundColor ?? backgroundColor,
       elevation: data?.elevation,
       key: data?.widgetKey ?? widgetKey,
@@ -272,6 +338,7 @@ class PlatformNavBar extends PlatformWidgetBase<CupertinoTabBar, Widget> {
       padding: data?.padding,
       surfaceTintColor: data?.surfaceTintColor,
       shadowColor: data?.shadowColor,
+      child: bar,
     );
   }
 
@@ -292,11 +359,55 @@ class PlatformNavBar extends PlatformWidgetBase<CupertinoTabBar, Widget> {
           const Border(
             top: BorderSide(
               color: _kDefaultTabBarBorderColor,
-              width: 0.0, // One physical pixel.
-              style: BorderStyle.solid,
+              width: 0, // One physical pixel.
             ),
           ),
       height: data?.height ?? height ?? _kTabBarHeight,
     );
   }
+
+  @override
+  TabView createWindowsWidget(BuildContext context) {
+    final data = windows?.call(context, platform(context));
+
+    return TabView(
+      key: data?.navigationBarKey ?? widgetKey,
+      currentIndex: 0,
+      tabs: data?.items
+              ?.map(
+                (bottomNavItem) => Tab(
+                  text: Text(bottomNavItem.label ?? ''),
+                  body: Text(bottomNavItem.label ?? ''),
+                  icon: bottomNavItem.icon,
+                ),
+              )
+              .toList(growable: false) ??
+          items
+              ?.map(
+                (bottomNavItem) => Tab(
+                  text: Text(bottomNavItem.label ?? ''),
+                  body: Text(bottomNavItem.label ?? ''),
+                  icon: bottomNavItem.icon,
+                ),
+              )
+              .toList(growable: false) ??
+          [],
+    );
+  }
+
+  //Todo(mehul): change themes here
+  @override
+  CupertinoTabBar createMacosWidget(BuildContext context) =>
+      createCupertinoWidget(context);
+
+  @override
+  Widget createLinuxWidget(BuildContext context) =>
+      createMaterialWidget(context);
+
+  @override
+  Widget createFuchsiaWidget(BuildContext context) =>
+      createMaterialWidget(context);
+
+  @override
+  Widget createWebWidget(BuildContext context) => createMaterialWidget(context);
 }

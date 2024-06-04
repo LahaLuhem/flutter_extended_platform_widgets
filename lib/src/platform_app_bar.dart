@@ -4,6 +4,7 @@
  * See LICENSE for distribution and usage details.
  */
 
+import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/cupertino.dart' show CupertinoNavigationBar;
 import 'package:flutter/material.dart' show AppBar, Brightness;
 import 'package:flutter/services.dart';
@@ -16,13 +17,12 @@ import 'platform_provider.dart';
 import 'widget_base.dart';
 
 //the default has alpha which will cause the content to slide under the header for ios
-const Color _kDefaultNavBarBorderColor = const Color(0x4C000000);
+const Color _kDefaultNavBarBorderColor = Color(0x4C000000);
 
-const Border _kDefaultNavBarBorder = const Border(
-  bottom: const BorderSide(
+const Border _kDefaultNavBarBorder = Border(
+  bottom: BorderSide(
     color: _kDefaultNavBarBorderColor,
-    width: 0.0, // One physical pixel.
-    style: BorderStyle.solid,
+    width: 0, // One physical pixel.
   ),
 );
 
@@ -133,12 +133,44 @@ class CupertinoNavigationBarData extends _BaseData {
 
   /// When enabling [iosUsesMaterialWidgets] on [PlatformProvider] settings it will
   /// add a Material widget as a parent to both the leading and trailing widgets.
-  /// Setting [noMaterialParent] to true (default false) will remove the [Material] parent
+  /// Setting [noMaterialParent] to true (default false) will remove the [material] parent
   final bool noMaterialParent;
 }
 
-class PlatformAppBar
-    extends PlatformWidgetBase<CupertinoNavigationBar, PreferredSizeWidget> {
+class FluentNavigationBarData extends _BaseData {
+  FluentNavigationBarData({
+    super.backgroundColor,
+    super.leading,
+    super.widgetKey,
+    super.automaticallyImplyLeading,
+  });
+}
+
+//Todo(mehul): change themes here
+class PlatformAppBar extends PlatformWidgetBase<
+    PreferredSizeWidget,
+    CupertinoNavigationBar,
+    Widget,
+    CupertinoNavigationBar,
+    PreferredSizeWidget,
+    PreferredSizeWidget,
+    PreferredSizeWidget> {
+  const PlatformAppBar({
+    super.key,
+    this.widgetKey,
+    this.title,
+    this.backgroundColor,
+    this.leading,
+    this.trailingActions,
+    this.automaticallyImplyLeading,
+    this.material,
+    this.cupertino,
+    this.windows,
+    this.macos,
+    this.linux,
+    this.fuchsia,
+    this.web,
+  });
   final Key? widgetKey;
 
   final Widget? title;
@@ -149,18 +181,11 @@ class PlatformAppBar
 
   final PlatformBuilder<MaterialAppBarData>? material;
   final PlatformBuilder<CupertinoNavigationBarData>? cupertino;
-
-  PlatformAppBar({
-    super.key,
-    this.widgetKey,
-    this.title,
-    this.backgroundColor,
-    this.leading,
-    this.trailingActions,
-    this.automaticallyImplyLeading,
-    this.material,
-    this.cupertino,
-  });
+  final PlatformBuilder<FluentNavigationBarData>? windows;
+  final PlatformBuilder<CupertinoNavigationBarData>? macos;
+  final PlatformBuilder<MaterialAppBarData>? linux;
+  final PlatformBuilder<MaterialAppBarData>? fuchsia;
+  final PlatformBuilder<MaterialAppBarData>? web;
 
   @override
   PreferredSizeWidget createMaterialWidget(BuildContext context) {
@@ -206,7 +231,7 @@ class PlatformAppBar
   CupertinoNavigationBar createCupertinoWidget(BuildContext context) {
     final data = cupertino?.call(context, platform(context));
 
-    var trailing = trailingActions?.isEmpty ?? true
+    final trailing = trailingActions?.isEmpty ?? true
         ? null
         : Row(
             mainAxisSize: MainAxisSize.min,
@@ -327,4 +352,24 @@ class PlatformAppBar
 
     return middleWithMediaQuery;
   }
+
+  @override
+  Widget createWindowsWidget(BuildContext context) => const SizedBox.shrink();
+
+  //Todo(mehul): change themes here
+  @override
+  CupertinoNavigationBar createMacosWidget(BuildContext context) =>
+      createCupertinoWidget(context);
+
+  @override
+  PreferredSizeWidget createLinuxWidget(BuildContext context) =>
+      createMaterialWidget(context);
+
+  @override
+  PreferredSizeWidget createFuchsiaWidget(BuildContext context) =>
+      createMaterialWidget(context);
+
+  @override
+  PreferredSizeWidget createWebWidget(BuildContext context) =>
+      createMaterialWidget(context);
 }

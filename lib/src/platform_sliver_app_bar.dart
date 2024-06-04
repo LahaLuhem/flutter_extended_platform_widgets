@@ -153,8 +153,94 @@ class CupertinoSliverAppBarData extends _BaseData {
   final Object heroTag;
 }
 
-class PlatformSliverAppBar
-    extends PlatformWidgetBase<CupertinoSliverNavigationBar, SliverAppBar> {
+class FluentSliverAppBarData extends _BaseData {
+  FluentSliverAppBarData({
+    // Common
+    super.widgetKey,
+    super.leading,
+    super.automaticallyImplyLeading,
+    super.backgroundColor,
+    super.stretch,
+    super.title,
+
+    //Material
+    this.actions,
+    this.flexibleSpace,
+    this.bottom,
+    this.elevation,
+    this.scrolledUnderElevation,
+    this.shadowColor,
+    this.surfaceTintColor,
+    this.forceElevated = false,
+    this.foregroundColor,
+    this.iconTheme,
+    this.actionsIconTheme,
+    this.primary = true,
+    this.centerTitle,
+    this.excludeHeaderSemantics = false,
+    this.titleSpacing,
+    this.collapsedHeight,
+    this.expandedHeight,
+    this.floating = false,
+    this.pinned = false,
+    this.snap = false,
+    this.stretchTriggerOffset = 100.0,
+    this.onStretchTrigger,
+    this.shape,
+    this.toolbarHeight = kToolbarHeight,
+    this.leadingWidth,
+    this.toolbarTextStyle,
+    this.titleTextStyle,
+    this.systemOverlayStyle,
+    this.forceMaterialTransparency = false,
+    this.clipBehavior,
+  })  : assert(floating || !snap,
+            'The "snap" argument only makes sense for floating app bars.'),
+        assert(stretchTriggerOffset > 0.0),
+        assert(collapsedHeight == null || collapsedHeight >= toolbarHeight,
+            'The "collapsedHeight" argument has to be larger than or equal to [toolbarHeight].');
+
+  // final Widget? title;
+  final List<Widget>? actions;
+  final Widget? flexibleSpace;
+  final PreferredSizeWidget? bottom;
+  final double? elevation;
+  final double? scrolledUnderElevation;
+  final Color? shadowColor;
+  final Color? surfaceTintColor;
+  final bool forceElevated;
+  final Color? foregroundColor;
+  final IconThemeData? iconTheme;
+  final IconThemeData? actionsIconTheme;
+  final bool primary;
+  final bool? centerTitle;
+  final bool excludeHeaderSemantics;
+  final double? titleSpacing;
+  final double? collapsedHeight;
+  final double? expandedHeight;
+  final bool floating;
+  final bool pinned;
+  final ShapeBorder? shape;
+  final bool snap;
+  final double stretchTriggerOffset;
+  final AsyncCallback? onStretchTrigger;
+  final double toolbarHeight;
+  final double? leadingWidth;
+  final TextStyle? toolbarTextStyle;
+  final TextStyle? titleTextStyle;
+  final SystemUiOverlayStyle? systemOverlayStyle;
+  final bool forceMaterialTransparency;
+  final Clip? clipBehavior;
+}
+
+class PlatformSliverAppBar extends PlatformWidgetBase<
+    SliverAppBar,
+    CupertinoSliverNavigationBar,
+    SliverAppBar,
+    CupertinoSliverNavigationBar,
+    SliverAppBar,
+    SliverAppBar,
+    SliverAppBar> {
   //Common
   final Key? widgetKey;
 
@@ -167,8 +253,13 @@ class PlatformSliverAppBar
   //Platform
   final PlatformBuilder<MaterialSliverAppBarData>? material;
   final PlatformBuilder<CupertinoSliverAppBarData>? cupertino;
+  final PlatformBuilder<FluentSliverAppBarData>? windows;
+  final PlatformBuilder<CupertinoSliverAppBarData>? macos;
+  final PlatformBuilder<MaterialSliverAppBarData>? linux;
+  final PlatformBuilder<MaterialSliverAppBarData>? web;
+  final PlatformBuilder<MaterialSliverAppBarData>? fuchsia;
 
-  PlatformSliverAppBar({
+  const PlatformSliverAppBar({
     //Common
     super.key,
     this.widgetKey,
@@ -180,6 +271,11 @@ class PlatformSliverAppBar
     //Platform
     this.material,
     this.cupertino,
+    this.windows,
+    this.macos,
+    this.linux,
+    this.web,
+    this.fuchsia,
   });
 
   @override
@@ -256,6 +352,69 @@ class PlatformSliverAppBar
       heroTag: data?.heroTag ?? _defaultHeroTag,
     );
   }
+
+  @override
+  SliverAppBar createWindowsWidget(BuildContext context) {
+    final data = windows?.call(context, platform(context));
+    return SliverAppBar(
+      //Common
+      key: data?.widgetKey ?? widgetKey,
+      leading: data?.leading ?? leading,
+      automaticallyImplyLeading:
+          data?.automaticallyImplyLeading ?? automaticallyImplyLeading ?? true,
+      backgroundColor: data?.backgroundColor ?? backgroundColor,
+      stretch: data?.stretch ?? stretch ?? false,
+      title: data?.title ?? title,
+
+      actions: data?.actions,
+      flexibleSpace: data?.flexibleSpace,
+      bottom: data?.bottom,
+      elevation: data?.elevation,
+      shadowColor: data?.shadowColor,
+      forceElevated: data?.forceElevated ?? false,
+      foregroundColor: data?.foregroundColor,
+      iconTheme: data?.iconTheme,
+      actionsIconTheme: data?.actionsIconTheme,
+      primary: data?.primary ?? true,
+      centerTitle: data?.centerTitle,
+      excludeHeaderSemantics: data?.excludeHeaderSemantics ?? false,
+      titleSpacing: data?.titleSpacing,
+      collapsedHeight: data?.collapsedHeight,
+      expandedHeight: data?.expandedHeight,
+      floating: data?.floating ?? false,
+      pinned: data?.pinned ?? false,
+      snap: data?.snap ?? false,
+      stretchTriggerOffset: data?.stretchTriggerOffset ?? 100.0,
+      onStretchTrigger: data?.onStretchTrigger,
+      shape: data?.shape,
+      toolbarHeight: data?.toolbarHeight ?? kToolbarHeight,
+      leadingWidth: data?.leadingWidth,
+      toolbarTextStyle: data?.toolbarTextStyle,
+      titleTextStyle: data?.titleTextStyle,
+      systemOverlayStyle: data?.systemOverlayStyle,
+      forceMaterialTransparency: data?.forceMaterialTransparency ?? false,
+      clipBehavior: data?.clipBehavior,
+      scrolledUnderElevation: data?.scrolledUnderElevation,
+      surfaceTintColor: data?.surfaceTintColor,
+    );
+  }
+
+  //Todo(mehul): change themes here
+  @override
+  CupertinoSliverNavigationBar createMacosWidget(BuildContext context) =>
+      createCupertinoWidget(context);
+
+  @override
+  SliverAppBar createLinuxWidget(BuildContext context) =>
+      createMaterialWidget(context);
+
+  @override
+  SliverAppBar createFuchsiaWidget(BuildContext context) =>
+      createMaterialWidget(context);
+
+  @override
+  SliverAppBar createWebWidget(BuildContext context) =>
+      createMaterialWidget(context);
 }
 
 //! Copied from file: /opt/homebrew/Caskroom/flutter/3.10.0/flutter/packages/flutter/lib/src/cupertino/nav_bar.dart
