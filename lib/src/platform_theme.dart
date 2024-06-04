@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:fluent_ui/fluent_ui.dart' show FluentTheme, FluentThemeData;
 import 'package:flutter/cupertino.dart' show CupertinoThemeData;
 import 'package:flutter/material.dart' show Theme, ThemeData, ThemeMode;
 import 'package:flutter/services.dart';
@@ -23,13 +26,17 @@ class PlatformTheme extends StatefulWidget {
     this.materialDarkTheme,
     this.cupertinoLightTheme,
     this.cupertinoDarkTheme,
+    this.fluentLightTheme,
+    this.fluentDarkTheme,
     this.matchCupertinoSystemChromeBrightness = true,
     this.onThemeModeChanged,
     super.key,
   });
+  final FluentThemeData? fluentLightTheme;
+  final FluentThemeData? fluentDarkTheme;
 
   static PlatformThemeState? of(BuildContext context) {
-    _PlatformThemeState? state =
+    final _PlatformThemeState? state =
         context.findAncestorStateOfType<_PlatformThemeState>();
 
     return state?.state;
@@ -51,6 +58,8 @@ class _PlatformThemeState extends State<PlatformTheme>
     _cupertinoDarkTheme = widget.cupertinoDarkTheme;
     _matchCupertinoSystemChromeBrightness =
         widget.matchCupertinoSystemChromeBrightness;
+    _fluentLightTheme = widget.fluentLightTheme;
+    _fluentDarkTheme = widget.fluentDarkTheme;
   }
 
   @override
@@ -86,6 +95,8 @@ class _PlatformThemeState extends State<PlatformTheme>
   ThemeData? _materialDarkTheme;
   CupertinoThemeData? _cupertinoLightTheme;
   CupertinoThemeData? _cupertinoDarkTheme;
+  FluentThemeData? _fluentLightTheme;
+  FluentThemeData? _fluentDarkTheme;
 
   ThemeMode? _themeMode;
   ThemeMode? get themeMode => _themeMode;
@@ -150,15 +161,23 @@ class _PlatformThemeState extends State<PlatformTheme>
 
     final platform = PlatformProvider.of(context)?.platform;
     final mDarkTheme = _materialDarkTheme ?? _materialLightTheme;
-    return Theme(
-      data: (isDark
-              ? mDarkTheme?.copyWith(platform: platform)
-              : _materialLightTheme?.copyWith(platform: platform)) ??
-          Theme.of(context),
-      child: Builder(
-        builder: (context) => widget.builder(context),
-      ),
-    );
+    return Platform.isWindows
+        ? FluentTheme(
+            data: (isDark ? _fluentDarkTheme : _fluentLightTheme) ??
+                FluentThemeData(),
+            child: Builder(
+              builder: widget.builder,
+            ),
+          )
+        : Theme(
+            data: (isDark
+                    ? mDarkTheme?.copyWith(platform: platform)
+                    : _materialLightTheme?.copyWith(platform: platform)) ??
+                Theme.of(context),
+            child: Builder(
+              builder: (context) => widget.builder(context),
+            ),
+          );
   }
 }
 
@@ -173,11 +192,14 @@ class PlatformThemeState {
   bool get isDark => _parent.isDark;
   bool get isMaterial3 => _parent.isMaterial3;
 
+  ThemeData? get materialLightTheme => _parent._materialLightTheme;
+  ThemeData? get materialDarkTheme => _parent._materialDarkTheme;
+
   CupertinoThemeData? get cupertinoLightTheme => _parent._cupertinoLightTheme;
   CupertinoThemeData? get cupertinoDarkTheme => _parent._cupertinoDarkTheme;
 
-  ThemeData? get materialLightTheme => _parent._materialLightTheme;
-  ThemeData? get materialDarkTheme => _parent._materialDarkTheme;
+  FluentThemeData? get fluentLightTheme => _parent._fluentLightTheme;
+  FluentThemeData? get fluentDarkTheme => _parent._fluentDarkTheme;
 
   @Deprecated(
       'Switching to and from Material 2 and 3 is deprecated has no effect and wil be removed in the future.')

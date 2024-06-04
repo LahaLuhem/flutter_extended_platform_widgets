@@ -34,7 +34,7 @@ class PlatformProvider extends StatefulWidget {
   final PlatformSettingsData? settings;
 
   static PlatformProviderState? of(BuildContext context) {
-    _PlatformProviderState? state =
+    final _PlatformProviderState? state =
         context.findAncestorStateOfType<_PlatformProviderState>();
 
     return state?.state;
@@ -75,6 +75,34 @@ class _PlatformProviderState extends State<PlatformProvider> {
     });
   }
 
+  /// Sets the platform to be [TargetPlatform.macOS]
+  void changeToMacosPlatform() {
+    setState(() {
+      platform = TargetPlatform.macOS;
+    });
+  }
+
+  /// Sets the platform to be [TargetPlatform.windows]
+  void changeToWindowsPlatform() {
+    setState(() {
+      platform = TargetPlatform.windows;
+    });
+  }
+
+  /// Sets the platform to be [TargetPlatform.linux]
+  void changeToLinuxPlatform() {
+    setState(() {
+      platform = TargetPlatform.linux;
+    });
+  }
+
+  /// Sets the platform to be [TargetPlatform.fuchsia]
+  void changeToFuchsiaPlatform() {
+    setState(() {
+      platform = TargetPlatform.fuchsia;
+    });
+  }
+
   void changeToAutoDetectPlatform() {
     setState(() {
       platform = null;
@@ -106,17 +134,12 @@ class PlatformProviderState {
   PlatformSettingsData get settings =>
       _parent.settings ?? PlatformSettingsData();
 
-  void changeToMaterialPlatform() {
-    _parent.changeToMaterialPlatform();
-  }
-
-  void changeToCupertinoPlatform() {
-    _parent.changeToCupertinoPlatform();
-  }
-
-  void changeToAutoDetectPlatform() {
-    _parent.changeToAutoDetectPlatform();
-  }
+  void changeToMaterialPlatform() => _parent.changeToMaterialPlatform();
+  void changeToCupertinoPlatform() => _parent.changeToCupertinoPlatform();
+  void changeToMacosPlatform() => _parent.changeToMacosPlatform();
+  void changeToWindowsPlatform() => _parent.changeToWindowsPlatform();
+  void changeToLinuxPlatform() => _parent.changeToLinuxPlatform();
+  void changeToFuchsiaPlatform() => _parent.changeToFuchsiaPlatform();
 }
 
 class PlatformSettingsData {
@@ -143,8 +166,8 @@ class PlatformSettingsData {
   /// and CupertinoTabScaffold widgets matching the behaviour before v1.6.0
   final bool legacyIosUsesMaterialWidgets;
 
-  /// The style each platform will use. Either [PlatformStyle.Material] or
-  /// [PlatformStyle.Cupertino].
+  /// The style each platform will use. Either [PlatformStyle.material] or
+  /// [PlatformStyle.cupertino].
   final PlatformStyleData platformStyle;
 
   /// Add MediaQuery as a parent to any given title value for a [PlatformAppBar] for the cupertino [CupertinoNavigationBar]
@@ -169,8 +192,13 @@ class PlatformSettingsData {
 }
 
 enum PlatformStyle {
-  Material,
-  Cupertino,
+  material,
+  cupertino,
+  macos,
+  windows,
+  linux,
+  fuchsia,
+  web;
 }
 
 class PlatformStyleData {
@@ -183,12 +211,12 @@ class PlatformStyleData {
   final PlatformStyle linux;
 
   const PlatformStyleData({
-    this.android = PlatformStyle.Material,
-    this.ios = PlatformStyle.Cupertino,
-    this.macos = PlatformStyle.Cupertino,
-    this.windows = PlatformStyle.Material,
-    this.web = PlatformStyle.Material,
-    this.fuchsia = PlatformStyle.Material,
-    this.linux = PlatformStyle.Material,
+    this.android = PlatformStyle.material,
+    this.ios = PlatformStyle.cupertino,
+    this.macos = PlatformStyle.macos,
+    this.windows = PlatformStyle.windows,
+    this.web = PlatformStyle.web,
+    this.fuchsia = PlatformStyle.fuchsia,
+    this.linux = PlatformStyle.linux,
   });
 }

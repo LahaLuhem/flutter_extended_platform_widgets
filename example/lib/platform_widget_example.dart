@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
-import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_extended_platform_widgets/flutter_extended_platform_widgets.dart';
 
 import 'extensions.dart';
 
@@ -17,6 +20,22 @@ class PlatformWidgetExample extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final TargetPlatform platform;
+    if (isMaterial(context)) {
+      platform = TargetPlatform.android;
+    } else if (isCupertino(context)) {
+      platform = TargetPlatform.iOS;
+    } else if (Platform.isWindows) {
+      platform = TargetPlatform.windows;
+    } else if (Platform.isMacOS) {
+      platform = TargetPlatform.macOS;
+    } else if (Platform.isLinux) {
+      platform = TargetPlatform.linux;
+    } else if (Platform.isFuchsia) {
+      platform = TargetPlatform.fuchsia;
+    } else
+      throw PlatformException(code: 'Unsupported platform');
+
     return Column(
       children: [
         Padding(
@@ -28,10 +47,9 @@ class PlatformWidgetExample extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: builder(
-                context,
-                isMaterial(context)
-                    ? TargetPlatform.android
-                    : TargetPlatform.iOS),
+              context,
+              platform,
+            ),
           ),
         Divider(
           height: 16,
@@ -64,6 +82,44 @@ class PlatformWidgetExample extends StatelessWidget {
                 child: builder(context, TargetPlatform.iOS),
               ),
             )).asCupertino(),
+        ((context) => Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: builder(context, TargetPlatform.windows),
+              ),
+            )).asWindows(),
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: VerticalDivider(
+            width: 1,
+            thickness: 1,
+          ),
+        ),
+        ((context) => Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: builder(context, TargetPlatform.macOS),
+              ),
+            )).asMacos(),
+        ((context) => Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: builder(context, TargetPlatform.linux),
+              ),
+            )).asLinux(),
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: VerticalDivider(
+            width: 1,
+            thickness: 1,
+          ),
+        ),
+        ((context) => Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: builder(context, TargetPlatform.fuchsia),
+              ),
+            )).asFuchsia(),
       ],
     ).maxWidth(500));
   }

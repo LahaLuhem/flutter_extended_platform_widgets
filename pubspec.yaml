@@ -1,8 +1,17 @@
-name: flutter_platform_widgets
+name: flutter_extended_platform_widgets
 description: Simplifying the use of both Material and Cupertino widgets with a single widget
 version: 8.0.0
 homepage: https://github.com/LahaLuhem/flutter_extended_platform_widgets
 documentation: https://github.com/stryder-dev/flutter_platform_widgets/wiki
+publish_to:
+
+platforms:
+  android:
+  ios:
+  windows:
+  macos:
+  linux:
+  web:
 
 
 
@@ -22,7 +31,14 @@ dependencies:
   flutter:
     sdk: flutter
 
+  # UI packages
+  fluent_ui: ^4.8.7
+  fluentui_system_icons: ^1.1.241
+
+  macos_ui: ^2.0.7
+
   cupertino_icons: ^1.0.8
+  cupertino_progress_bar: ^0.2.0
 
 
 
@@ -32,9 +48,6 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-
-
-
-
+  very_good_analysis: ^5.1.0
 
 flutter:

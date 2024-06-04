@@ -1,6 +1,8 @@
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'package:flutter_extended_platform_widgets/flutter_extended_platform_widgets.dart';
 
 import 'cupertino_date_picker.dart';
 import 'extensions.dart';
@@ -27,14 +29,39 @@ class PlatformPage extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: PlatformElevatedButton(
-                  child: PlatformText('Change Platform'),
-                  onPressed: () {
-                    final p = PlatformProvider.of(context)!;
-
-                    isMaterial(context)
-                        ? p.changeToCupertinoPlatform()
-                        : p.changeToMaterialPlatform();
-                  }),
+                child: PlatformPopupMenu(
+                  options: [
+                    for (final option in TargetPlatform.values)
+                      PopupMenuOption(
+                        label: option.name,
+                        onTap: (_) {
+                          final p = PlatformProvider.of(context)!;
+                          switch (option) {
+                            case TargetPlatform.android:
+                              p.changeToMaterialPlatform();
+                              break;
+                            case TargetPlatform.iOS:
+                              p.changeToCupertinoPlatform();
+                              break;
+                            case TargetPlatform.windows:
+                              p.changeToWindowsPlatform();
+                              break;
+                            case TargetPlatform.macOS:
+                              p.changeToMacosPlatform();
+                              break;
+                            case TargetPlatform.linux:
+                              p.changeToLinuxPlatform();
+                              break;
+                            case TargetPlatform.fuchsia:
+                              p.changeToFuchsiaPlatform();
+                              break;
+                          }
+                        },
+                      )
+                  ],
+                  icon: PlatformText('Change Platform'),
+                ),
+              ),
             ),
 
             Padding(
@@ -244,13 +271,6 @@ class PlatformPage extends StatelessWidget {
                 autovalidateMode: AutovalidateMode.always,
               ),
             ),
-
-            // ! PlatformCircularProgressIndicator
-            // _PlatformWidgetExample(
-            //   title: 'PlatformCircularProgressIndicator',
-            //   builder: (_) => PlatformCircularProgressIndicator().center,
-            // ),
-            // ! PlatformWidgetBuilder
             PlatformWidgetExample(
               title: 'PlatformWidgetBuilder',
               builder: (_, platform) => PlatformWidgetBuilder(
@@ -282,6 +302,12 @@ class PlatformPage extends StatelessWidget {
                   context,
                   material: (data) => data.textTheme.headlineSmall,
                   cupertino: (data) => data.textTheme.navTitleTextStyle,
+                  windows: (data) =>
+                      data.navigationPaneTheme.itemHeaderTextStyle,
+                  macos: (data) => data.textTheme.navTitleTextStyle,
+                  linux: (data) => data.textTheme.headlineSmall,
+                  web: (data) => data.textTheme.headlineSmall,
+                  fuchsia: (data) => data.textTheme.headlineSmall,
                 ),
               ),
             ),
@@ -310,27 +336,38 @@ class PlatformPage extends StatelessWidget {
             // ! Date Picker
             PlatformWidgetExample(
               title: 'showPlatformDatePicker',
-              builder: (_, platform) => PlatformElevatedButton(
-                child: Text(platform.text),
-                onPressed: () => _showDatePicker(context),
-              ),
+              builder: (_, platform) {
+                final now = DateTime.now();
+                return platform.name == 'windows'
+                    ? FluentDatePicker(
+                        initialDate: now,
+                        firstDate: now.subtract(Duration(days: 60)),
+                        lastDate: now.add(Duration(days: 60)),
+                      )
+                    : PlatformElevatedButton(
+                        child: Text(platform.text),
+                        onPressed: () => _showDatePicker(context),
+                      );
+              },
             ),
             // ! Date Picker with Custom iOS
-            PlatformWidgetExample(
-              title: 'showPlatformDatePicker (Custom Cupertino 1 )',
-              builder: (_, platform) => PlatformElevatedButton(
-                child: Text(platform.text),
-                onPressed: () => showDatePickerWithCustomCupertino(context),
+            if (!Platform.isWindows)
+              PlatformWidgetExample(
+                title: 'showPlatformDatePicker (Custom Cupertino 1 )',
+                builder: (_, platform) => PlatformElevatedButton(
+                  child: Text(platform.text),
+                  onPressed: () => showDatePickerWithCustomCupertino(context),
+                ),
               ),
-            ),
-            PlatformWidgetExample(
-              title: 'showPlatformDatePicker (Custom Cupertino 2)',
-              builder: (_, platform) => PlatformElevatedButton(
-                child: Text(platform.text),
-                onPressed: () =>
-                    showDatePickerWithCustomCupertinoStateful(context),
+            if (!Platform.isWindows)
+              PlatformWidgetExample(
+                title: 'showPlatformDatePicker (Custom Cupertino 2)',
+                builder: (_, platform) => PlatformElevatedButton(
+                  child: Text(platform.text),
+                  onPressed: () =>
+                      showDatePickerWithCustomCupertinoStateful(context),
+                ),
               ),
-            ),
             // ! Dialogs
             PlatformWidgetExample(
               title: 'showPlatformDialog',
@@ -360,7 +397,19 @@ class PlatformPage extends StatelessWidget {
                 ),
               ),
             ),
-
+            // ! Icons
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: PlatformElevatedButton(
+                child: Text('Show Platform Icons'),
+                onPressed: () => Navigator.of(context).push(
+                  platformPageRoute(
+                    context: context,
+                    builder: (context) => IconsPage(),
+                  ),
+                ),
+              ),
+            ),
             // ! Platform Sliver AppBar
             Padding(
               padding: const EdgeInsets.all(8.0),
@@ -403,6 +452,20 @@ class PlatformPage extends StatelessWidget {
                   ),
                 ),
               ),
+            Padding(
+              padding: const EdgeInsets.all(8),
+              child: Center(
+                child: PlatformCircularProgressIndicator(),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8),
+              child: Center(
+                child: PlatformLinearProgressBar(
+                  value: null,
+                ),
+              ),
+            ),
           ],
         ),
       ),
@@ -471,6 +534,11 @@ _showPopupSheet(BuildContext context, String text) {
     builder: (_) => PlatformWidget(
       material: (_, __) => _androidPopupContent(context, text),
       cupertino: (_, __) => _cupertinoSheetContent(context, text),
+      windows: (_, __) => _androidPopupContent(context, text),
+      macos: (_, __) => _cupertinoSheetContent(context, text),
+      linux: (_, __) => _androidPopupContent(context, text),
+      fuchsia: (_, __) => _androidPopupContent(context, text),
+      web: (_, __) => _androidPopupContent(context, text),
     ),
   );
 }

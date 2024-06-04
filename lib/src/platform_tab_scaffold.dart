@@ -4,6 +4,8 @@
  * See LICENSE for distribution and usage details.
  */
 
+import 'package:fluent_ui/fluent_ui.dart'
+    show NavigationAppBar, NavigationPane, NavigationView, PaneItem;
 import 'package:flutter/cupertino.dart'
     show
         CupertinoPageScaffold,
@@ -22,15 +24,15 @@ import 'package:flutter/material.dart'
         Scaffold;
 import 'package:flutter/widgets.dart';
 
-import 'extensions.dart';
-import 'platform.dart';
-import 'platform_app_bar.dart';
-import 'platform_nav_bar.dart';
-import 'platform_provider.dart';
-import 'widget_base.dart';
+import 'package:flutter_extended_platform_widgets/src/extensions.dart';
+import 'package:flutter_extended_platform_widgets/src/platform.dart';
+import 'package:flutter_extended_platform_widgets/src/platform_app_bar.dart';
+import 'package:flutter_extended_platform_widgets/src/platform_nav_bar.dart';
+import 'package:flutter_extended_platform_widgets/src/platform_provider.dart';
+import 'package:flutter_extended_platform_widgets/src/widget_base.dart';
 
 abstract class _BaseData {
-  _BaseData({
+  const _BaseData({
     this.widgetKey,
     this.backgroundColor,
   });
@@ -40,7 +42,7 @@ abstract class _BaseData {
 }
 
 class MaterialTabScaffoldData extends _BaseData {
-  MaterialTabScaffoldData({
+  const MaterialTabScaffoldData({
     super.backgroundColor,
     super.widgetKey,
     this.bodyBuilder,
@@ -99,7 +101,7 @@ class MaterialTabScaffoldData extends _BaseData {
 }
 
 class CupertinoTabViewData {
-  CupertinoTabViewData({
+  const CupertinoTabViewData({
     this.defaultTitle,
     this.navigatorKey,
     this.navigatorObservers,
@@ -117,7 +119,7 @@ class CupertinoTabViewData {
 }
 
 class CupertinoTabScaffoldData extends _BaseData {
-  CupertinoTabScaffoldData({
+  const CupertinoTabScaffoldData({
     super.backgroundColor,
     super.widgetKey,
     this.items,
@@ -141,7 +143,9 @@ class CupertinoTabScaffoldData extends _BaseData {
 
   final Widget Function(BuildContext context, int index)? bodyBuilder;
   final ObstructingPreferredSizeWidget? Function(
-      BuildContext context, int index)? appBarBuilder;
+    BuildContext context,
+    int index,
+  )? appBarBuilder;
   final bool? resizeToAvoidBottomInset;
   final bool? resizeToAvoidBottomInsetTab;
   final Color? tabsBackgroundColor;
@@ -152,13 +156,30 @@ class CupertinoTabScaffoldData extends _BaseData {
   final double? navBarHeight;
 }
 
-class PlatformTabScaffold extends PlatformWidgetBase<Widget, Widget> {
-  final Key? widgetKey;
-
+class FluentTabScaffoldData extends _BaseData {
   final Widget Function(BuildContext context, int index)? bodyBuilder;
-  final Color? pageBackgroundColor;
+  final FluentTabController? controller;
+  final NavigationAppBar? Function(BuildContext context, int index)?
+      appBarBuilder;
+  final bool? extendBodyBehindAppBar;
   final Color? tabsBackgroundColor;
-  final void Function(int index)? itemChanged;
+  final double? height;
+
+  const FluentTabScaffoldData({
+    super.backgroundColor,
+    super.widgetKey,
+    this.bodyBuilder,
+    this.appBarBuilder,
+    this.controller,
+    this.extendBodyBehindAppBar,
+    this.tabsBackgroundColor,
+    this.height,
+  });
+}
+
+class PlatformTabScaffold extends PlatformWidgetBase<Widget, Widget, Widget,
+    Widget, Widget, Widget, Widget> {
+  final Key? widgetKey;
 
   final PlatformBuilder<MaterialTabScaffoldData>? material;
   final PlatformIndexBuilder<MaterialTabScaffoldData>? materialBuilder;
@@ -171,6 +192,10 @@ class PlatformTabScaffold extends PlatformWidgetBase<Widget, Widget> {
 
   final PlatformBuilder<CupertinoTabBarData>? cupertinoTabs;
 
+  final PlatformBuilder<FluentTabScaffoldData>? windows;
+  final PlatformIndexBuilder<FluentTabScaffoldData>? windowsBuilder;
+  final PlatformBuilder<FluentTabBarData>? windowsTabs;
+
   final bool iosContentPadding;
   final bool iosContentBottomPadding;
 
@@ -180,11 +205,15 @@ class PlatformTabScaffold extends PlatformWidgetBase<Widget, Widget> {
 
   final PlatformAppBar? Function(BuildContext context, int index)?
       appBarBuilder;
+  final Widget Function(BuildContext context, int index)? bodyBuilder;
+  final Color? pageBackgroundColor;
+  final Color? tabsBackgroundColor;
+  final void Function(int index)? itemChanged;
 
   final String? restorationId;
   final double? navBarHeight;
 
-  PlatformTabScaffold({
+  const PlatformTabScaffold({
     super.key,
     this.widgetKey,
     this.items,
@@ -205,6 +234,9 @@ class PlatformTabScaffold extends PlatformWidgetBase<Widget, Widget> {
     this.cupertino,
     this.cupertinoBuilder,
     this.cupertinoTabs,
+    this.windows,
+    this.windowsBuilder,
+    this.windowsTabs,
   })  : assert(
           (material != null && materialBuilder == null) || material == null,
         ),
@@ -218,6 +250,12 @@ class PlatformTabScaffold extends PlatformWidgetBase<Widget, Widget> {
         assert(
           (cupertino == null && cupertinoBuilder != null) ||
               cupertinoBuilder == null,
+        ),
+        assert(
+          (windows != null && windowsBuilder == null) || windows == null,
+        ),
+        assert(
+          (windows == null && windowsBuilder != null) || windowsBuilder == null,
         );
 
   @override
@@ -226,7 +264,8 @@ class PlatformTabScaffold extends PlatformWidgetBase<Widget, Widget> {
 
     final controller = data?.controller ?? tabController?._material(context);
 
-    assert(controller != null, '''MaterialTabController cannot be null. 
+    assert(controller != null, '''
+MaterialTabController cannot be null. 
     Either have material: (_, __) => MaterialTabScaffoldData(controller: controller) or 
     PlatformTabScaffold(tabController: controller) ''');
 
@@ -306,7 +345,8 @@ class PlatformTabScaffold extends PlatformWidgetBase<Widget, Widget> {
 
     final controller = data?.controller ?? tabController?._cupertino(context);
 
-    assert(controller != null, '''CupertinoTabController cannot be null. 
+    assert(controller != null, '''
+CupertinoTabController cannot be null. 
     Either have material: (_, __) => CupertinoTabScaffoldData(cntroller: controller) or 
     PlatformTabScaffold(tabController: controller) ''');
 
@@ -400,8 +440,10 @@ class PlatformTabScaffold extends PlatformWidgetBase<Widget, Widget> {
 
     // Ensure that there is Material widget at the root page level
     // as there can be Material widgets used on ios
-    return result.withMaterial(useLegacyMaterial &&
-        context.findAncestorWidgetOfExactType<Material>() == null);
+    return result.withMaterial(
+      useLegacyMaterial &&
+          context.findAncestorWidgetOfExactType<Material>() == null,
+    );
   }
 
   CupertinoPageScaffold _buildCupertinoPageScaffold(
@@ -422,14 +464,14 @@ class PlatformTabScaffold extends PlatformWidgetBase<Widget, Widget> {
     return CupertinoPageScaffold(
       //key Not used
       navigationBar: appBar,
+      backgroundColor: data?.backgroundColor ?? pageBackgroundColor,
+      resizeToAvoidBottomInset: data?.resizeToAvoidBottomInset ?? true,
       child: iosContentPad(
         context,
         child!.withMaterial(useMaterial),
         appBar,
         tabBar,
       ),
-      backgroundColor: data?.backgroundColor ?? pageBackgroundColor,
-      resizeToAvoidBottomInset: data?.resizeToAvoidBottomInset ?? true,
     );
   }
 
@@ -439,17 +481,17 @@ class PlatformTabScaffold extends PlatformWidgetBase<Widget, Widget> {
     ObstructingPreferredSizeWidget? navigationBar,
     CupertinoTabBar tabBar,
   ) {
-    final MediaQueryData existingMediaQuery = MediaQuery.of(context);
+    final existingMediaQuery = MediaQuery.of(context);
 
     if (!iosContentPadding && !iosContentBottomPadding) {
       return child;
     }
 
-    double top = 0;
-    double bottom = 0;
+    var top = 0.0;
+    var bottom = 0.0;
 
     if (iosContentPadding && navigationBar != null) {
-      final double topPadding =
+      final topPadding =
           navigationBar.preferredSize.height + existingMediaQuery.padding.top;
 
       final obstruct = navigationBar.shouldFullyObstruct(context);
@@ -466,18 +508,102 @@ class PlatformTabScaffold extends PlatformWidgetBase<Widget, Widget> {
       child: child,
     );
   }
+
+  @override
+  Widget createWindowsWidget(BuildContext context) {
+    final data = windows?.call(context, platform(context));
+
+    final controller = data?.controller ?? tabController?._windows(context);
+
+    assert(controller != null, '''
+MaterialTabController cannot be null. 
+    Either have material: (_, __) => MaterialTabScaffoldData(controller: controller) or 
+    PlatformTabScaffold(tabController: controller) ''');
+
+    return AnimatedBuilder(
+      animation: controller!,
+      builder: (context, _) => _buildWindows(
+        context,
+        windowsBuilder?.call(context, platform(context), controller.index) ??
+            data,
+        controller,
+      ),
+    );
+  }
+
+  Widget _buildWindows(
+    BuildContext context,
+    FluentTabScaffoldData? data,
+    FluentTabController controller,
+  ) {
+    final platformNavBar = PlatformNavBar(
+      items: items,
+      backgroundColor: data?.tabsBackgroundColor ?? tabsBackgroundColor,
+      currentIndex: controller.index,
+      windows: windowsTabs,
+      itemChanged: (int index) {
+        controller.index = index;
+        itemChanged?.call(index);
+      },
+      height: data?.height ?? navBarHeight,
+    );
+    final tabBar = platformNavBar.createWindowsWidget(context);
+
+    final child = data?.bodyBuilder?.call(context, controller.index) ??
+        bodyBuilder?.call(context, controller.index);
+
+    final appBar = data?.appBarBuilder?.call(context, controller.index);
+
+    return NavigationView(
+      key: data?.widgetKey ?? widgetKey,
+      content: child,
+      appBar: appBar ??
+          NavigationAppBar(
+            key: appBar?.key,
+            title: appBar?.title,
+            leading: appBar?.leading,
+            actions: appBar?.actions,
+            automaticallyImplyLeading:
+                appBar?.automaticallyImplyLeading ?? true,
+            backgroundColor: data?.backgroundColor ??
+                appBar?.backgroundColor ??
+                pageBackgroundColor,
+          ),
+      pane: child == null
+          ? NavigationPane(
+              items: tabBar.tabs
+                  .map(
+                    (tab) => PaneItem(
+                      icon: tab.icon ?? tab.text,
+                      body: tab.body,
+                      title: tab.text,
+                    ),
+                  )
+                  .toList(growable: false),
+            )
+          : null,
+    );
+  }
+
+  //Todo(mehul): change themes here
+  @override
+  Widget createMacosWidget(BuildContext context) =>
+      createCupertinoWidget(context);
+
+  @override
+  Widget createLinuxWidget(BuildContext context) =>
+      createMaterialWidget(context);
+
+  @override
+  Widget createFuchsiaWidget(BuildContext context) =>
+      createMaterialWidget(context);
+
+  @override
+  Widget createWebWidget(BuildContext context) => createMaterialWidget(context);
 }
 
 class MaterialTabControllerData {
   MaterialTabControllerData({
-    this.initialIndex,
-  });
-
-  final int? initialIndex;
-}
-
-class CupertinoTabControllerData {
-  CupertinoTabControllerData({
     this.initialIndex,
   });
 
@@ -501,22 +627,57 @@ class MaterialTabController extends ChangeNotifier {
   }
 }
 
+class CupertinoTabControllerData {
+  CupertinoTabControllerData({
+    this.initialIndex,
+  });
+
+  final int? initialIndex;
+}
+
+class FluentTabControllerData {
+  FluentTabControllerData({
+    this.initialIndex,
+  });
+
+  final int? initialIndex;
+}
+
+class FluentTabController extends ChangeNotifier {
+  FluentTabController({int initialIndex = 0})
+      : _index = initialIndex,
+        assert(initialIndex >= 0);
+
+  int get index => _index;
+  int _index;
+  set index(int value) {
+    assert(value >= 0);
+    if (_index == value) {
+      return;
+    }
+    _index = value;
+    notifyListeners();
+  }
+}
+
 // In the same file so that the private android or ios controllers can be accessed
 class PlatformTabController extends ChangeNotifier {
-  MaterialTabController? _materialController;
-  CupertinoTabController? _cupertinoController;
-
-  final MaterialTabControllerData? android;
-  final CupertinoTabControllerData? ios;
-
-  final int _initialIndex;
-
   PlatformTabController({
     int initialIndex = 0,
     this.android,
     this.ios,
+    this.windows,
   })  : _initialIndex = initialIndex,
         assert(initialIndex >= 0);
+  MaterialTabController? _materialController;
+  CupertinoTabController? _cupertinoController;
+  FluentTabController? _windowsController;
+
+  final MaterialTabControllerData? android;
+  final CupertinoTabControllerData? ios;
+  final FluentTabControllerData? windows;
+
+  final int _initialIndex;
 
   CupertinoTabController? _cupertino(BuildContext context) {
     _init(context);
@@ -528,10 +689,18 @@ class PlatformTabController extends ChangeNotifier {
     return _materialController;
   }
 
+  FluentTabController? _windows(BuildContext context) {
+    _init(context);
+    return _windowsController;
+  }
+
   int index(BuildContext context) {
     _init(context);
 
-    return _materialController?.index ?? _cupertinoController?.index ?? 0;
+    return _materialController?.index ??
+        _cupertinoController?.index ??
+        _windowsController?.index ??
+        0;
   }
 
   void setIndex(BuildContext context, int index) {
@@ -541,36 +710,67 @@ class PlatformTabController extends ChangeNotifier {
 
     _materialController?.index = index;
     _cupertinoController?.index = index;
+    _windowsController?.index = index;
   }
 
   void _init(BuildContext context) {
     if (isMaterial(context)) {
       if (_materialController == null) {
-        int useIndex = android?.initialIndex ?? _initialIndex;
+        var useIndex = android?.initialIndex ?? _initialIndex;
         if (_cupertinoController != null) {
           useIndex = _cupertinoController?.index ?? 0;
-
           _cupertinoController?.removeListener(_listener);
           _cupertinoController?.dispose();
           _cupertinoController = null;
         }
+        if (_windowsController != null) {
+          useIndex = _windowsController?.index ?? 0;
+          _windowsController?.removeListener(_listener);
+          _windowsController?.dispose();
+          _windowsController = null;
+        }
+
         _materialController = MaterialTabController(
           initialIndex: useIndex,
         )..addListener(_listener);
       }
-    }
-    if (isCupertino(context)) {
+    } else if (isCupertino(context)) {
       if (_cupertinoController == null) {
-        int useIndex = ios?.initialIndex ?? _initialIndex;
+        var useIndex = ios?.initialIndex ?? _initialIndex;
         if (_materialController != null) {
           useIndex = _materialController?.index ?? 0;
-
           _materialController?.removeListener(_listener);
           _materialController?.dispose();
           _materialController = null;
         }
+        if (_windowsController != null) {
+          useIndex = _windowsController?.index ?? 0;
+          _windowsController?.removeListener(_listener);
+          _windowsController?.dispose();
+          _windowsController = null;
+        }
 
         _cupertinoController = CupertinoTabController(
+          initialIndex: useIndex,
+        )..addListener(_listener);
+      }
+    } else if (isWindows(context)) {
+      if (_windowsController == null) {
+        var useIndex = windows?.initialIndex ?? _initialIndex;
+        if (_materialController != null) {
+          useIndex = _materialController?.index ?? 0;
+          _materialController?.removeListener(_listener);
+          _materialController?.dispose();
+          _materialController = null;
+        }
+        if (_cupertinoController != null) {
+          useIndex = _cupertinoController?.index ?? 0;
+          _cupertinoController?.removeListener(_listener);
+          _cupertinoController?.dispose();
+          _cupertinoController = null;
+        }
+
+        _windowsController = FluentTabController(
           initialIndex: useIndex,
         )..addListener(_listener);
       }
@@ -589,6 +789,9 @@ class PlatformTabController extends ChangeNotifier {
     _cupertinoController?.removeListener(_listener);
     _cupertinoController?.dispose();
     _cupertinoController = null;
+    _windowsController?.removeListener(_listener);
+    _windowsController?.dispose();
+    _windowsController = null;
     super.dispose();
   }
 }
