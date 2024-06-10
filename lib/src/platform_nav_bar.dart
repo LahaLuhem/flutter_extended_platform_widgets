@@ -372,7 +372,8 @@ class PlatformNavBar extends PlatformWidgetBase<Widget, CupertinoTabBar,
 
     return TabView(
       key: data?.navigationBarKey ?? widgetKey,
-      currentIndex: 0,
+      onChanged: data?.itemChanged ?? itemChanged,
+      currentIndex: data?.currentIndex ?? currentIndex ?? 0,
       tabs: data?.items
               ?.map(
                 (bottomNavItem) => Tab(
