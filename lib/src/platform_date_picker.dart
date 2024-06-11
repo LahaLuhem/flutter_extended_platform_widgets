@@ -316,9 +316,9 @@ class DefaultCupertinoDatePicker extends StatelessWidget {
 Future<T?> _showDateModalBottomSheet<T>(
   BuildContext context,
   Widget content,
-) async {
-  return await showPlatformModalSheet<T>(
+) {
+  return showPlatformModalSheet<T>(
     context: context,
-    builder: (builder) => content,
+    builder: (_) => content,
   );
 }

@@ -10,8 +10,8 @@ import 'icons_page.dart';
 import 'logo.dart';
 import 'material_ios_page.dart';
 import 'platform_widget_example.dart';
-import 'tab_impl_page.dart';
 import 'sliver_app_bar_page.dart';
+import 'tab_impl_page.dart';
 
 class PlatformPage extends StatelessWidget {
   @override
@@ -79,11 +79,9 @@ class PlatformPage extends StatelessWidget {
             Divider(thickness: 10),
             // ! PlatformSearchBar
             PlatformWidgetExample(
-              title:
-                  'PlatformSearchBar ${isMaterial(context) ? " (Material 3 only)" : ""}',
+              title: 'PlatformSearchBar ${isMaterial(context) ? " (Material 3 only)" : ""}',
               builder: (context, platform) => PlatformSearchBar(
-                onChanged: (value) =>
-                    print('${platform.text} SearchBar changed: $value'),
+                onChanged: (value) => print('${platform.text} SearchBar changed: $value'),
                 onTap: () => print('${platform.text} SearchBar tapped'),
                 hintText: '${platform.text} SearchBar',
               ),
@@ -247,8 +245,7 @@ class PlatformPage extends StatelessWidget {
             // ! PlatformTextField
             PlatformWidgetExample(
               title: 'PlatformTextField',
-              builder: (_, platform) =>
-                  PlatformTextField(hintText: platform.text),
+              builder: (_, platform) => PlatformTextField(hintText: platform.text),
             ),
             PlatformWidgetExample(
               title: 'PlatformTextField multiline',
@@ -266,8 +263,7 @@ class PlatformPage extends StatelessWidget {
               title: 'PlatformTextFormField',
               builder: (_, platform) => PlatformTextFormField(
                 hintText: 'hint',
-                validator: (value) =>
-                    (value?.length ?? 0) < 3 ? 'Not enough' : null,
+                validator: (value) => (value?.length ?? 0) < 3 ? 'Not enough' : null,
                 autovalidateMode: AutovalidateMode.always,
               ),
             ),
@@ -302,8 +298,7 @@ class PlatformPage extends StatelessWidget {
                   context,
                   material: (data) => data.textTheme.headlineSmall,
                   cupertino: (data) => data.textTheme.navTitleTextStyle,
-                  windows: (data) =>
-                      data.navigationPaneTheme.itemHeaderTextStyle,
+                  windows: (data) => data.navigationPaneTheme.itemHeaderTextStyle,
                   macos: (data) => data.textTheme.navTitleTextStyle,
                   linux: (data) => data.textTheme.headlineSmall,
                   web: (data) => data.textTheme.headlineSmall,
@@ -338,16 +333,10 @@ class PlatformPage extends StatelessWidget {
               title: 'showPlatformDatePicker',
               builder: (_, platform) {
                 final now = DateTime.now();
-                return platform.name == 'windows'
-                    ? FluentDatePicker(
-                        initialDate: now,
-                        firstDate: now.subtract(Duration(days: 60)),
-                        lastDate: now.add(Duration(days: 60)),
-                      )
-                    : PlatformElevatedButton(
-                        child: Text(platform.text),
-                        onPressed: () => _showDatePicker(context),
-                      );
+                return PlatformElevatedButton(
+                  child: Text(platform.text),
+                  onPressed: () => _showDatePicker(context),
+                );
               },
             ),
             // ! Date Picker with Custom iOS
@@ -364,8 +353,7 @@ class PlatformPage extends StatelessWidget {
                 title: 'showPlatformDatePicker (Custom Cupertino 2)',
                 builder: (_, platform) => PlatformElevatedButton(
                   child: Text(platform.text),
-                  onPressed: () =>
-                      showDatePickerWithCustomCupertinoStateful(context),
+                  onPressed: () => showDatePickerWithCustomCupertinoStateful(context),
                 ),
               ),
             // ! Dialogs
@@ -571,8 +559,7 @@ Widget _androidPopupContent(BuildContext context, String text) {
 Widget _cupertinoSheetContent(BuildContext context, String text) {
   return CupertinoActionSheet(
     title: Text('$text Favorite Dessert'),
-    message:
-        const Text('Please select the best dessert from the options below.'),
+    message: const Text('Please select the best dessert from the options below.'),
     actions: <Widget>[
       CupertinoActionSheetAction(
         child: const Text('Profiteroles'),

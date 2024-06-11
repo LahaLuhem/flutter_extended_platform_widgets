@@ -45,7 +45,6 @@ enum PlatformTarget {
 
   /// Windows: <https://www.windows.com>
   windows,
-
   web,
 }
 
