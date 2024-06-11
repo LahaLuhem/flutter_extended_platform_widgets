@@ -47,7 +47,6 @@ enum PlatformTarget {
 
   /// Windows: <https://www.windows.com>
   windows,
-
   web,
 }
 
@@ -78,16 +77,22 @@ PlatformStyle _platformStyle(BuildContext context) {
 
 bool isMaterial(BuildContext context) =>
     _platformStyle(context) == PlatformStyle.material;
+
 bool isCupertino(BuildContext context) =>
     _platformStyle(context) == PlatformStyle.cupertino;
+
 bool isWindows(BuildContext context) =>
     PlatformStyle.windows == _platformStyle(context);
+
 bool isMacos(BuildContext context) =>
     _platformStyle(context) == PlatformStyle.macos;
+
 bool isLinux(BuildContext context) =>
     _platformStyle(context) == PlatformStyle.linux;
+
 bool isFuchsia(BuildContext context) =>
     _platformStyle(context) == PlatformStyle.fuchsia;
+
 bool isWeb(BuildContext context) =>
     _platformStyle(context) == PlatformStyle.web;
 
@@ -151,6 +156,7 @@ abstract class _DialogBaseData {
     this.barrierLabel,
     this.anchorPoint,
   });
+
   final WidgetBuilder? builder;
   final bool? barrierDismissible;
   final RouteSettings? routeSettings;
@@ -210,6 +216,7 @@ class MacosDialogData extends _DialogBaseData {
     this.useSafeArea,
     this.barrierColor,
   });
+
   final bool? useSafeArea;
   final Color? barrierColor;
 }
@@ -225,6 +232,7 @@ class LinuxDialogData extends _DialogBaseData {
     this.useSafeArea,
     this.barrierColor,
   });
+
   final bool? useSafeArea;
   final Color? barrierColor;
 }
@@ -240,6 +248,7 @@ class WebDialogData extends _DialogBaseData {
     this.useSafeArea,
     this.barrierColor,
   });
+
   final bool? useSafeArea;
   final Color? barrierColor;
 }
@@ -255,6 +264,7 @@ class FuchsiaDialogData extends _DialogBaseData {
     this.useSafeArea,
     this.barrierColor,
   });
+
   final bool? useSafeArea;
   final Color? barrierColor;
 }
@@ -427,6 +437,7 @@ class CupertinoModalSheetData extends _ModalSheetBaseData {
     this.barrierDismissible,
     this.routeSettings,
   });
+
   final ImageFilter? imageFilter;
   final bool? semanticsDismissible;
   final bool? useRootNavigator;
@@ -448,6 +459,7 @@ class WindowsModalSheetData {
     this.routeSettings,
     this.transitionAnimationController,
   });
+
   final Color? backgroundColor;
   final double? elevation;
   final ShapeBorder? shape;
@@ -471,6 +483,7 @@ class MacosModalSheetData extends _ModalSheetBaseData {
     this.barrierDismissible,
     this.routeSettings,
   });
+
   final ImageFilter? imageFilter;
   final bool? semanticsDismissible;
   final bool? useRootNavigator;
@@ -496,6 +509,7 @@ class LinuxModalSheetData extends _ModalSheetBaseData {
     this.constraints,
     this.useSafeArea,
   });
+
   final Color? backgroundColor;
   final double? elevation;
   final ShapeBorder? shape;
@@ -528,6 +542,7 @@ class WebModalSheetData extends _ModalSheetBaseData {
     this.constraints,
     this.useSafeArea,
   });
+
   final Color? backgroundColor;
   final double? elevation;
   final ShapeBorder? shape;
@@ -560,6 +575,7 @@ class FuchsiaModalSheetData extends _ModalSheetBaseData {
     this.constraints,
     this.useSafeArea,
   });
+
   final Color? backgroundColor;
   final double? elevation;
   final ShapeBorder? shape;
@@ -582,8 +598,8 @@ Future<T?> showPlatformModalSheet<T>({
   required WidgetBuilder builder,
   MaterialModalSheetData? material,
   CupertinoModalSheetData? cupertino,
-  MacosModalSheetData? macos,
   WindowsModalSheetData? windows,
+  MacosModalSheetData? macos,
   LinuxModalSheetData? linux,
   WebModalSheetData? web,
   FuchsiaModalSheetData? fuchsia,
@@ -629,16 +645,9 @@ Future<T?> showPlatformModalSheet<T>({
     // return fluent.showDialog(
     //   context: context,
     //   builder: builder,
-    //   backgroundColor: windows?.backgroundColor,
-    //   elevation: windows?.elevation,
-    //   shape: windows?.shape,
-    //   isScrollControlled: windows?.isScrollControlled ?? false,
     //   useRootNavigator: windows?.useRootNavigator ?? false,
     //   barrierColor: windows?.barrierColor,
-    //   enableDrag: windows?.enableDrag ?? true,
-    //   isDismissible: windows?.isDismissible ?? true,
     //   routeSettings: windows?.routeSettings,
-    //   transitionAnimationController: windows?.transitionAnimationController,
     // );
   }
   //Todo(mehul): Make them platform-specific

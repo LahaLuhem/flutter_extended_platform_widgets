@@ -25,6 +25,7 @@ class DatePickerContentData {
     this.firstDate,
     this.lastDate,
   });
+
   final DateTime? initialDate;
   final DateTime? firstDate;
   final DateTime? lastDate;
@@ -37,11 +38,12 @@ typedef DatePickerContentBuilder = Widget Function(
 );
 
 abstract class _BaseData {
-  _BaseData({
+  const _BaseData({
     this.initialDate,
     this.firstDate,
     this.lastDate,
   });
+
   final DateTime? initialDate;
   final DateTime? firstDate;
   final DateTime? lastDate;
@@ -140,34 +142,31 @@ class CupertinoDatePickerData extends _BaseData {
 }
 
 class FluentDatePickerData extends _BaseData {
-  FluentDatePickerData({
-    this.key,
-    super.initialDate,
-    super.firstDate,
-    super.lastDate,
-    this.onDateTimeChanged,
-    this.minimumYear = 1,
-    this.maximumYear,
-    this.minuteInterval = 1,
-    this.use24hFormat = false,
-    this.dateOrder,
-    this.backgroundColor,
-    this.doneLabel,
-    this.cancelLabel,
-    this.showDayOfWeek,
-  });
-
   final Key? key;
-  final int? minimumYear;
-  final int? maximumYear;
   final int? minuteInterval;
   final bool? use24hFormat;
   final DatePickerDateOrder? dateOrder;
   final ValueChanged<DateTime>? onDateTimeChanged;
-  final Color? backgroundColor;
   final String? doneLabel;
   final String? cancelLabel;
-  final bool? showDayOfWeek;
+
+  final bool showDatePicker;
+  final bool showTimePicker;
+
+  const FluentDatePickerData({
+    this.key,
+    super.initialDate,
+    super.firstDate,
+    super.lastDate,
+    this.minuteInterval = 1,
+    this.use24hFormat = false,
+    this.showDatePicker = false,
+    this.showTimePicker = true,
+    this.onDateTimeChanged,
+    this.dateOrder,
+    this.doneLabel,
+    this.cancelLabel,
+  });
 }
 
 Future<DateTime?> showPlatformDatePicker({
@@ -177,6 +176,7 @@ Future<DateTime?> showPlatformDatePicker({
   required DateTime lastDate,
   PlatformBuilder<MaterialDatePickerData>? material,
   PlatformBuilder<CupertinoDatePickerData>? cupertino,
+  PlatformBuilder<FluentDatePickerData>? windows,
   PlatformBuilder<CupertinoDatePickerData>? macos,
   PlatformBuilder<MaterialDatePickerData>? linux,
   PlatformBuilder<MaterialDatePickerData>? fuchsia,
@@ -237,6 +237,54 @@ Future<DateTime?> showPlatformDatePicker({
             lastDate: lastDate,
           ),
     );
+  } else if (isWindows(context)) {
+    final data = windows?.call(context, platform(context));
+    DateTime? selectedDate;
+    final showDatePicker = data?.showDatePicker ?? false;
+    final showTimePicker = data?.showTimePicker ?? true;
+    assert(
+      showDatePicker || showTimePicker,
+      'Atleast one of the pickers must be shown',
+    );
+
+    await fluent.showDialog<DateTime?>(
+      context: context,
+      barrierDismissible: true,
+      builder: (context) => fluent.StatefulBuilder(
+        builder: (context, setState) => Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            if (showDatePicker)
+              fluent.DatePicker(
+                key: data?.key,
+                selected: selectedDate,
+                startDate: data?.firstDate ?? firstDate,
+                endDate: data?.lastDate ?? lastDate,
+                onChanged: (newDate) {
+                  data?.onDateTimeChanged?.call(newDate);
+                  setState(() => selectedDate = newDate);
+                },
+              ),
+            if (showDatePicker && showTimePicker) const SizedBox(width: 16),
+            if (showTimePicker)
+              fluent.TimePicker(
+                key: data?.key,
+                selected: selectedDate,
+                minuteIncrement: data?.minuteInterval ?? 1,
+                hourFormat: (data?.use24hFormat ?? false)
+                    ? fluent.HourFormat.HH
+                    : fluent.HourFormat.h,
+                onChanged: (newTime) {
+                  data?.onDateTimeChanged?.call(newTime);
+                  setState(() => selectedDate = newTime);
+                },
+              ),
+          ],
+        ),
+      ),
+    );
+
+    return selectedDate;
   } else if (isMacos(context)) {
     final data = macos?.call(context, platform(context));
 
@@ -385,6 +433,7 @@ class DefaultCupertinoDatePicker extends StatelessWidget {
     this.cancelLabel,
     super.key,
   });
+
   final double modalHeight;
   final Color? modalColor;
   final CupertinoDatePickerMode mode;
@@ -443,51 +492,12 @@ class DefaultCupertinoDatePicker extends StatelessWidget {
   }
 }
 
-class FluentDatePicker extends StatefulWidget {
-  const FluentDatePicker({
-    required this.initialDate,
-    required this.firstDate,
-    required this.lastDate,
-    this.data,
-    super.key,
-  });
-
-  final FluentDatePickerData? data;
-  final DateTime initialDate, firstDate, lastDate;
-
-  @override
-  State<FluentDatePicker> createState() => _FluentDatePickerState();
-}
-
-class _FluentDatePickerState extends State<FluentDatePicker> {
-  _FluentDatePickerState({DateTime? selectedDate})
-      : selectedDate = selectedDate ?? DateTime.now();
-  DateTime selectedDate;
-
-  @override
-  Widget build(BuildContext context) {
-    // widget.data?.;
-    return fluent.DatePicker(
-      key: widget.data?.key,
-      selected: selectedDate,
-      startDate: widget.data?.firstDate ?? widget.firstDate,
-      endDate: widget.data?.lastDate ?? widget.lastDate,
-      onChanged: (newDate) {
-        if (widget.data?.onDateTimeChanged != null) {
-          widget.data?.onDateTimeChanged!(newDate);
-        }
-        setState(() => selectedDate = newDate);
-      },
-    );
-  }
-}
-
 Future<T?> _showDateModalBottomSheet<T>(
   BuildContext context,
   Widget content,
-) async {
-  return await showPlatformModalSheet<T>(
+) {
+  return showPlatformModalSheet<T>(
     context: context,
-    builder: (builder) => content,
+    builder: (_) => content,
   );
 }
