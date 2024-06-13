@@ -5,13 +5,7 @@
  */
 
 import 'package:fluent_ui/fluent_ui.dart'
-    show
-        NavigationAppBar,
-        NavigationPane,
-        NavigationPaneItem,
-        NavigationView,
-        PaneItem,
-        ScaffoldPage;
+    show NavigationAppBar, NavigationPane, NavigationPaneItem, NavigationView, PaneItem, PaneItemSeparator, ScaffoldPage;
 import 'package:flutter/cupertino.dart'
     show
         CupertinoPageScaffold,
@@ -29,8 +23,6 @@ import 'package:flutter/material.dart'
         Material,
         Scaffold;
 import 'package:flutter/widgets.dart';
-import 'package:collection/collection.dart';
-
 import 'package:flutter_extended_platform_widgets/src/extensions.dart';
 import 'package:flutter_extended_platform_widgets/src/platform.dart';
 import 'package:flutter_extended_platform_widgets/src/platform_app_bar.dart';
@@ -81,7 +73,8 @@ class MaterialTabScaffoldData extends _BaseData {
 
   final Widget Function(BuildContext context, int index)? bodyBuilder;
   final MaterialTabController? controller;
-  final PreferredSizeWidget? Function(BuildContext context, int index)? appBarBuilder;
+  final PreferredSizeWidget? Function(BuildContext context, int index)?
+      appBarBuilder;
   final Widget? drawer;
   final Widget? endDrawer;
   final Widget? floatingActionButton;
@@ -144,7 +137,8 @@ class CupertinoTabScaffoldData extends _BaseData {
 
   final List<BottomNavigationBarItem>? items;
 
-  final CupertinoTabViewData Function(BuildContext context, int index)? tabViewDataBuilder;
+  final CupertinoTabViewData Function(BuildContext context, int index)?
+      tabViewDataBuilder;
 
   final Widget Function(BuildContext context, int index)? bodyBuilder;
   final ObstructingPreferredSizeWidget? Function(
@@ -164,10 +158,14 @@ class CupertinoTabScaffoldData extends _BaseData {
 class FluentTabScaffoldData extends _BaseData {
   final Widget Function(BuildContext context, int index)? bodyBuilder;
   final FluentTabController? controller;
-  final NavigationAppBar? Function(BuildContext context, int index)? appBarBuilder;
+  final NavigationAppBar? Function(BuildContext context, int index)?
+      appBarBuilder;
   final bool? extendBodyBehindAppBar;
   final Color? tabsBackgroundColor;
   final double? height;
+
+  /// Remaps the last [remapToFooterItemsIndex] items from [bodyBuilder] as fixed footer items with a separator
+  final int remapToFooterItemsIndex;
 
   const FluentTabScaffoldData({
     super.backgroundColor,
@@ -178,11 +176,12 @@ class FluentTabScaffoldData extends _BaseData {
     this.extendBodyBehindAppBar,
     this.tabsBackgroundColor,
     this.height,
+    this.remapToFooterItemsIndex = 0,
   });
 }
 
-class PlatformTabScaffold
-    extends PlatformWidgetBase<Widget, Widget, Widget, Widget, Widget, Widget, Widget> {
+class PlatformTabScaffold extends PlatformWidgetBase<Widget, Widget, Widget,
+    Widget, Widget, Widget, Widget> {
   final Key? widgetKey;
 
   final PlatformBuilder<MaterialTabScaffoldData>? material;
@@ -207,7 +206,8 @@ class PlatformTabScaffold
 
   final List<BottomNavigationBarItem>? items;
 
-  final PlatformAppBar? Function(BuildContext context, int index)? appBarBuilder;
+  final PlatformAppBar? Function(BuildContext context, int index)?
+      appBarBuilder;
   final Widget Function(BuildContext context, int index)? bodyBuilder;
   final Color? pageBackgroundColor;
   final Color? tabsBackgroundColor;
@@ -244,13 +244,15 @@ class PlatformTabScaffold
           (material != null && materialBuilder == null) || material == null,
         ),
         assert(
-          (material == null && materialBuilder != null) || materialBuilder == null,
+          (material == null && materialBuilder != null) ||
+              materialBuilder == null,
         ),
         assert(
           (cupertino != null && cupertinoBuilder == null) || cupertino == null,
         ),
         assert(
-          (cupertino == null && cupertinoBuilder != null) || cupertinoBuilder == null,
+          (cupertino == null && cupertinoBuilder != null) ||
+              cupertinoBuilder == null,
         ),
         assert(
           (windows != null && windowsBuilder == null) || windows == null,
@@ -274,7 +276,8 @@ MaterialTabController cannot be null.
       animation: controller!,
       builder: (context, _) => _buildMaterial(
         context,
-        materialBuilder?.call(context, platform(context), controller.index) ?? data,
+        materialBuilder?.call(context, platform(context), controller.index) ??
+            data,
         controller,
       ),
     );
@@ -303,7 +306,9 @@ MaterialTabController cannot be null.
         bodyBuilder?.call(context, controller.index);
 
     final appBar = data?.appBarBuilder?.call(context, controller.index) ??
-        appBarBuilder?.call(context, controller.index)?.createMaterialWidget(context);
+        appBarBuilder
+            ?.call(context, controller.index)
+            ?.createMaterialWidget(context);
 
     return Scaffold(
       key: data?.widgetKey ?? widgetKey,
@@ -319,18 +324,21 @@ MaterialTabController cannot be null.
       persistentFooterButtons: data?.persistentFooterButtons,
       primary: data?.primary ?? true,
       bottomSheet: data?.bottomSheet,
-      drawerDragStartBehavior: data?.drawerDragStartBehavior ?? DragStartBehavior.start,
+      drawerDragStartBehavior:
+          data?.drawerDragStartBehavior ?? DragStartBehavior.start,
       extendBody: data?.extendBody ?? false,
       resizeToAvoidBottomInset: data?.resizeToAvoidBottomInset,
       drawerScrimColor: data?.drawerScrimColor,
       drawerEdgeDragWidth: data?.drawerEdgeDragWidth,
       extendBodyBehindAppBar: data?.extendBodyBehindAppBar ?? false,
       drawerEnableOpenDragGesture: data?.drawerEnableOpenDragGesture ?? true,
-      endDrawerEnableOpenDragGesture: data?.endDrawerEnableOpenDragGesture ?? true,
+      endDrawerEnableOpenDragGesture:
+          data?.endDrawerEnableOpenDragGesture ?? true,
       onDrawerChanged: data?.onDrawerChanged,
       onEndDrawerChanged: data?.onEndDrawerChanged,
       restorationId: data?.restorationId ?? restorationId,
-      persistentFooterAlignment: data?.persistentFooterAlignment ?? AlignmentDirectional.centerEnd,
+      persistentFooterAlignment:
+          data?.persistentFooterAlignment ?? AlignmentDirectional.centerEnd,
     );
   }
 
@@ -382,7 +390,8 @@ CupertinoTabController cannot be null.
     final tabBar = navBar.createCupertinoWidget(context);
 
     final providerState = PlatformProvider.of(context);
-    final useLegacyMaterial = providerState?.settings.legacyIosUsesMaterialWidgets ?? false;
+    final useLegacyMaterial =
+        providerState?.settings.legacyIosUsesMaterialWidgets ?? false;
     final useMaterial = providerState?.settings.iosUsesMaterialWidgets ?? false;
 
     final result = CupertinoTabScaffold(
@@ -395,12 +404,18 @@ CupertinoTabController cannot be null.
         if (data?.useCupertinoTabView ?? false) {
           return CupertinoTabView(
             // key Not used
-            defaultTitle: data?.tabViewDataBuilder?.call(context, index).defaultTitle,
-            navigatorKey: data?.tabViewDataBuilder?.call(context, index).navigatorKey,
-            navigatorObservers: data?.tabViewDataBuilder?.call(context, index).navigatorObservers ??
+            defaultTitle:
+                data?.tabViewDataBuilder?.call(context, index).defaultTitle,
+            navigatorKey:
+                data?.tabViewDataBuilder?.call(context, index).navigatorKey,
+            navigatorObservers: data?.tabViewDataBuilder
+                    ?.call(context, index)
+                    .navigatorObservers ??
                 const <NavigatorObserver>[],
-            onGenerateRoute: data?.tabViewDataBuilder?.call(context, index).onGenerateRoute,
-            onUnknownRoute: data?.tabViewDataBuilder?.call(context, index).onUnknownRoute,
+            onGenerateRoute:
+                data?.tabViewDataBuilder?.call(context, index).onGenerateRoute,
+            onUnknownRoute:
+                data?.tabViewDataBuilder?.call(context, index).onUnknownRoute,
             routes: data?.tabViewDataBuilder?.call(context, index).routes,
             builder: (context) {
               return _buildCupertinoPageScaffold(
@@ -429,7 +444,8 @@ CupertinoTabController cannot be null.
     // Ensure that there is Material widget at the root page level
     // as there can be Material widgets used on ios
     return result.withMaterial(
-      useLegacyMaterial && context.findAncestorWidgetOfExactType<Material>() == null,
+      useLegacyMaterial &&
+          context.findAncestorWidgetOfExactType<Material>() == null,
     );
   }
 
@@ -443,7 +459,8 @@ CupertinoTabController cannot be null.
     final appBar = data?.appBarBuilder?.call(context, index) ??
         appBarBuilder?.call(context, index)?.createCupertinoWidget(context);
 
-    final child = data?.bodyBuilder?.call(context, index) ?? bodyBuilder?.call(context, index);
+    final child = data?.bodyBuilder?.call(context, index) ??
+        bodyBuilder?.call(context, index);
 
     assert(child != null);
 
@@ -477,7 +494,8 @@ CupertinoTabController cannot be null.
     var bottom = 0.0;
 
     if (iosContentPadding && navigationBar != null) {
-      final topPadding = navigationBar.preferredSize.height + existingMediaQuery.padding.top;
+      final topPadding =
+          navigationBar.preferredSize.height + existingMediaQuery.padding.top;
 
       final obstruct = navigationBar.shouldFullyObstruct(context);
 
@@ -501,15 +519,16 @@ CupertinoTabController cannot be null.
     final controller = data?.controller ?? tabController?._windows(context);
 
     assert(controller != null, '''
-MaterialTabController cannot be null. 
-    Either have material: (_, __) => MaterialTabScaffoldData(controller: controller) or 
+FluentTabController cannot be null. 
+    Either have windows: (_, __) => FluentTabScaffoldData(controller: controller) or 
     PlatformTabScaffold(tabController: controller) ''');
 
     return AnimatedBuilder(
       animation: controller!,
       builder: (context, _) => _buildWindows(
         context,
-        windowsBuilder?.call(context, platform(context), controller.index) ?? data,
+        windowsBuilder?.call(context, platform(context), controller.index) ??
+            data,
         controller,
       ),
     );
@@ -538,6 +557,8 @@ MaterialTabController cannot be null.
 
     final appBar = data?.appBarBuilder?.call(context, controller.index);
 
+    final remapSplitIndex = tabBar.tabs.length - (data?.remapToFooterItemsIndex ?? 0);
+
     return NavigationView(
       key: data?.widgetKey ?? widgetKey,
       appBar: appBar ??
@@ -546,36 +567,48 @@ MaterialTabController cannot be null.
             title: appBar?.title,
             leading: appBar?.leading,
             actions: appBar?.actions,
-            automaticallyImplyLeading: appBar?.automaticallyImplyLeading ?? true,
-            backgroundColor:
-                data?.backgroundColor ?? appBar?.backgroundColor ?? pageBackgroundColor,
+            automaticallyImplyLeading:
+                appBar?.automaticallyImplyLeading ?? true,
+            backgroundColor: data?.backgroundColor ??
+                appBar?.backgroundColor ??
+                pageBackgroundColor,
           ),
       pane: NavigationPane(
-        items: tabBar.tabs
-            .mapIndexed(
-              (index, tab) => PaneItem(
+          items: [
+            for (final (index, tab) in tabBar.tabs.take(remapSplitIndex).indexed)
+              PaneItem(
                 onTap: () => tabBar.onChanged!(index),
                 icon: tab.icon ?? tab.text,
                 body: ScaffoldPage.withPadding(content: child ?? tab.body),
                 title: tab.text,
               ),
-            )
-            .toList(growable: false)
-            // See error at https://github.com/bdlukaa/fluent_ui/issues/519#issuecomment-1240266393
-            .cast<NavigationPaneItem>(),
+          ],
+          footerItems: [
+            PaneItemSeparator(),
+            for (final (index, tab) in tabBar.tabs.skip(remapSplitIndex).indexed)
+              PaneItem(
+                onTap: () => tabBar.onChanged!(remapSplitIndex - index),
+                icon: tab.icon ?? tab.text,
+                body: ScaffoldPage.withPadding(content: child ?? tab.body),
+                title: tab.text,
+              ),
+          ],
       ),
     );
   }
 
   //Todo(mehul): change themes here
   @override
-  Widget createMacosWidget(BuildContext context) => createCupertinoWidget(context);
+  Widget createMacosWidget(BuildContext context) =>
+      createCupertinoWidget(context);
 
   @override
-  Widget createLinuxWidget(BuildContext context) => createMaterialWidget(context);
+  Widget createLinuxWidget(BuildContext context) =>
+      createMaterialWidget(context);
 
   @override
-  Widget createFuchsiaWidget(BuildContext context) => createMaterialWidget(context);
+  Widget createFuchsiaWidget(BuildContext context) =>
+      createMaterialWidget(context);
 
   @override
   Widget createWebWidget(BuildContext context) => createMaterialWidget(context);

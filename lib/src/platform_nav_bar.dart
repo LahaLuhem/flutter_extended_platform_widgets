@@ -17,7 +17,6 @@ import 'package:flutter/material.dart'
         NavigationDestinationLabelBehavior,
         Theme;
 import 'package:flutter/widgets.dart';
-
 import 'package:flutter_extended_platform_widgets/src/platform.dart';
 import 'package:flutter_extended_platform_widgets/src/widget_base.dart';
 
@@ -239,6 +238,7 @@ class PlatformNavBar extends PlatformWidgetBase<Widget, CupertinoTabBar,
     this.fuchsia,
     this.web,
   });
+
   final Key? widgetKey;
   final Color? backgroundColor;
 
@@ -380,16 +380,7 @@ class PlatformNavBar extends PlatformWidgetBase<Widget, CupertinoTabBar,
       key: data?.navigationBarKey ?? widgetKey,
       onChanged: data?.itemChanged ?? itemChanged,
       currentIndex: data?.currentIndex ?? currentIndex ?? 0,
-      tabs: data?.items
-              ?.map(
-                (bottomNavItem) => Tab(
-                  text: Text(bottomNavItem.label ?? ''),
-                  body: Text(bottomNavItem.label ?? ''),
-                  icon: bottomNavItem.icon,
-                ),
-              )
-              .toList(growable: false) ??
-          items
+      tabs: (data?.items ?? items)
               ?.map(
                 (bottomNavItem) => Tab(
                   text: Text(bottomNavItem.label ?? ''),
