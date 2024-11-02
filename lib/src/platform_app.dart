@@ -14,8 +14,6 @@ import 'package:flutter/material.dart'
         ThemeData,
         ThemeMode,
         kThemeAnimationDuration;
-import 'package:flutter/widgets.dart';
-import 'package:macos_ui/macos_ui.dart';
 
 import 'platform.dart';
 import 'platform_theme.dart';
@@ -915,13 +913,6 @@ class PlatformApp extends PlatformWidgetBase<MaterialApp, CupertinoApp,
         showPerformanceOverlay: dataRouter?.showPerformanceOverlay ??
             showPerformanceOverlay ??
             false,
-        checkerboardRasterCacheImages:
-            dataRouter?.checkerboardRasterCacheImages ??
-                checkerboardRasterCacheImages ??
-                false,
-        checkerboardOffscreenLayers: dataRouter?.checkerboardOffscreenLayers ??
-            checkerboardOffscreenLayers ??
-            false,
         showSemanticsDebugger:
             dataRouter?.showSemanticsDebugger ?? showSemanticsDebugger ?? false,
         debugShowCheckedModeBanner: dataRouter?.debugShowCheckedModeBanner ??
@@ -965,12 +956,6 @@ class PlatformApp extends PlatformWidgetBase<MaterialApp, CupertinoApp,
             const <Locale>[Locale('en', 'US')],
         showPerformanceOverlay:
             data?.showPerformanceOverlay ?? showPerformanceOverlay ?? false,
-        checkerboardRasterCacheImages: data?.checkerboardRasterCacheImages ??
-            checkerboardRasterCacheImages ??
-            false,
-        checkerboardOffscreenLayers: data?.checkerboardOffscreenLayers ??
-            checkerboardOffscreenLayers ??
-            false,
         showSemanticsDebugger:
             data?.showSemanticsDebugger ?? showSemanticsDebugger ?? false,
         debugShowCheckedModeBanner: data?.debugShowCheckedModeBanner ??
@@ -995,8 +980,10 @@ class PlatformApp extends PlatformWidgetBase<MaterialApp, CupertinoApp,
 
   FluentThemeData? _getFluentLightTheme(BuildContext context) =>
       PlatformTheme.of(context)?.fluentLightTheme;
+
   FluentThemeData? _getFluentDarkTheme(BuildContext context) =>
       PlatformTheme.of(context)?.fluentDarkTheme;
+
   ThemeMode? _getFluentThemeMode(BuildContext context) =>
       PlatformTheme.of(context)?.themeMode;
 
