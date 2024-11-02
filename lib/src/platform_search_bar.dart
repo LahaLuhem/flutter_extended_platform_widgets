@@ -29,6 +29,7 @@ abstract class _BaseData {
     this.autofocus,
     this.enabled,
   });
+
   final Key? widgetKey;
   final FocusNode? focusNode;
   final TextEditingController? controller;
@@ -258,6 +259,7 @@ class PlatformSearchBar
               : null),
       autoFocus: data?.autofocus ?? autoFocus ?? false,
       keyboardType: data?.keyboardType ?? keyboardType,
+      enabled: data?.enabled ?? enabled ?? true,
 
       //Material only
       leading: data?.leading,
@@ -299,6 +301,7 @@ class PlatformSearchBar
       style: data?.style ?? textStyle,
       autofocus: data?.autofocus ?? autoFocus ?? false,
       keyboardType: data?.keyboardType ?? keyboardType ?? TextInputType.text,
+      enabled: data?.enabled,
 
       //Cupertino only
       onSubmitted: data?.onSubmitted,
