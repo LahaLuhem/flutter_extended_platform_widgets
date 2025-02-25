@@ -46,9 +46,9 @@ abstract class _BaseData {
     this.shortcuts,
     this.actions,
     this.onGenerateInitialRoutes,
-    // ignore: unused_element
+    //ignore: unused_element_parameter
     this.highContrastDarkTheme,
-    // ignore: unused_element
+    //ignore: unused_element_parameter
     this.highContrastTheme,
     this.restorationScopeId,
     this.scrollBehavior,
@@ -108,16 +108,16 @@ abstract class _BaseRouterData {
     this.shortcuts,
     this.actions,
     this.onGenerateInitialRoutes,
-    // ignore: unused_element
+    //ignore: unused_element_parameter
     this.highContrastDarkTheme,
-    // ignore: unused_element
+    //ignore: unused_element_parameter
     this.highContrastTheme,
     this.routeInformationProvider,
     this.routeInformationParser,
     this.routerDelegate,
     this.routerConfig,
     this.backButtonDispatcher,
-    // ignore: unused_element
+    //ignore: unused_element_parameter
     this.restorationScopeId,
     this.scrollBehavior,
     this.onNavigationNotification,
