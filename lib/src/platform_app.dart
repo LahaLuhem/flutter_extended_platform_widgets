@@ -46,9 +46,9 @@ abstract class _BaseData {
     this.shortcuts,
     this.actions,
     this.onGenerateInitialRoutes,
-    // ignore: unused_element
+    //ignore: unused_element_parameter
     this.highContrastDarkTheme,
-    // ignore: unused_element
+    //ignore: unused_element_parameter
     this.highContrastTheme,
     this.restorationScopeId,
     this.scrollBehavior,
