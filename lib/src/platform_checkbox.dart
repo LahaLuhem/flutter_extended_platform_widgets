@@ -4,7 +4,7 @@
  * See LICENSE for distribution and usage details.
  */
 
-import 'package:flutter/cupertino.dart' show CupertinoCheckbox;
+import 'package:flutter/cupertino.dart' show CupertinoCheckbox, CupertinoColors;
 import 'package:flutter/material.dart'
     show Checkbox, MaterialTapTargetSize, VisualDensity;
 import 'package:flutter/widgets.dart';
@@ -29,6 +29,7 @@ abstract class _BaseData {
     this.fillColor,
     this.semanticLabel,
   });
+
   final Key? widgetKey;
   final bool? value;
   final bool? tristate;
@@ -190,6 +191,13 @@ class PlatformCheckbox extends PlatformWidgetBase<CupertinoCheckbox, Checkbox> {
       tristate: tristate,
       onChanged: data?.onChanged ?? onChanged,
       activeColor: data?.activeColor ?? activeColor,
+      fillColor: WidgetStateProperty.resolveWith((Set<WidgetState> states) {
+        if (states.contains(WidgetState.disabled))
+          return CupertinoColors.white.withValues(alpha: 0.5);
+        if (states.contains(WidgetState.selected))
+          return data?.activeColor ?? activeColor;
+        return data?.fillColor;
+      }),
       checkColor: data?.checkColor ?? checkColor,
       focusColor: data?.focusColor ?? focusColor,
       focusNode: data?.focusNode ?? focusNode,
