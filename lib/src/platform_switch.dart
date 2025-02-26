@@ -95,7 +95,7 @@ class CupertinoSwitchData extends _BaseData {
     super.focusNode,
     super.autofocus,
     super.onFocusChange,
-    this.trackColor,
+    this.inactiveTrackColor,
     this.thumbColor,
     this.applyTheme,
     this.focusColor,
@@ -103,7 +103,7 @@ class CupertinoSwitchData extends _BaseData {
     this.onLabelColor,
   });
 
-  final Color? trackColor;
+  final Color? inactiveTrackColor;
   final Color? thumbColor;
   final bool? applyTheme;
   final Color? focusColor;
@@ -183,11 +183,11 @@ class PlatformSwitch extends PlatformWidgetBase<CupertinoSwitch, Switch> {
       key: data?.widgetKey ?? widgetKey,
       value: data?.value ?? value,
       onChanged: data?.onChanged ?? onChanged,
-      activeColor: data?.activeColor ?? activeColor,
+      activeTrackColor: data?.activeColor ?? activeColor,
       dragStartBehavior: data?.dragStartBehavior ??
           dragStartBehavior ??
           DragStartBehavior.start,
-      trackColor: data?.trackColor,
+      inactiveTrackColor: data?.inactiveTrackColor,
       thumbColor: data?.thumbColor,
       applyTheme: data?.applyTheme,
       focusColor: data?.focusColor,

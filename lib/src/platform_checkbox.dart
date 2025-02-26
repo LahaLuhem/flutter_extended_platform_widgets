@@ -4,9 +4,9 @@
  * See LICENSE for distribution and usage details.
  */
 
-import 'package:flutter/cupertino.dart' show CupertinoCheckbox;
+import 'package:flutter/cupertino.dart' show CupertinoCheckbox, CupertinoColors;
 import 'package:flutter/material.dart'
-    show Checkbox, MaterialTapTargetSize, MaterialStateProperty, VisualDensity;
+    show Checkbox, MaterialTapTargetSize, VisualDensity;
 import 'package:flutter/widgets.dart';
 
 import 'platform.dart';
@@ -26,6 +26,7 @@ abstract class _BaseData {
     this.shape,
     this.side,
   });
+
   final Key? widgetKey;
   final bool? value;
   final bool? tristate;
@@ -66,9 +67,9 @@ class MaterialCheckboxData extends _BaseData {
   });
 
   final MouseCursor? mouseCursor;
-  final MaterialStateProperty<Color?>? fillColor;
+  final WidgetStateProperty<Color?>? fillColor;
   final Color? hoverColor;
-  final MaterialStateProperty<Color?>? overlayColor;
+  final WidgetStateProperty<Color?>? overlayColor;
   final double? splashRadius;
   final MaterialTapTargetSize? materialTapTargetSize;
   final VisualDensity? visualDensity;
@@ -92,10 +93,10 @@ class CupertinoCheckboxData extends _BaseData {
     super.side,
 
     //Cupertino
-    this.inactiveColor,
+    this.fillColor,
   });
 
-  final Color? inactiveColor;
+  final Color? fillColor;
 }
 
 class PlatformCheckbox extends PlatformWidgetBase<CupertinoCheckbox, Checkbox> {
@@ -175,13 +176,19 @@ class PlatformCheckbox extends PlatformWidgetBase<CupertinoCheckbox, Checkbox> {
     assert(tristate || value != null);
     return CupertinoCheckbox(
       //Cupertino
-      inactiveColor: data?.inactiveColor,
       //Common
       key: data?.widgetKey ?? widgetKey,
       value: value,
       tristate: tristate,
       onChanged: data?.onChanged ?? onChanged,
       activeColor: data?.activeColor ?? activeColor,
+      fillColor: WidgetStateProperty.resolveWith((Set<WidgetState> states) {
+        if (states.contains(WidgetState.disabled))
+          return CupertinoColors.white.withValues(alpha: 0.5);
+        if (states.contains(WidgetState.selected))
+          return data?.activeColor ?? activeColor;
+        return data?.fillColor;
+      }),
       checkColor: data?.checkColor ?? checkColor,
       focusColor: data?.focusColor ?? focusColor,
       focusNode: data?.focusNode ?? focusNode,

@@ -1,3 +1,5 @@
+import 'dart:ui' as ui show BoxHeightStyle, BoxWidthStyle;
+
 import 'package:flutter/cupertino.dart'
     show
         CupertinoAdaptiveTextSelectionToolbar,
@@ -13,7 +15,6 @@ import 'package:flutter/material.dart'
         TextFormField;
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
-import 'dart:ui' as ui show BoxHeightStyle, BoxWidthStyle;
 
 import 'platform.dart';
 import 'widget_base.dart';
@@ -471,7 +472,7 @@ class PlatformTextFormField
       cursorOpacityAnimates: data?.cursorOpacityAnimates,
       dragStartBehavior: data?.dragStartBehavior ?? DragStartBehavior.start,
       onAppPrivateCommand: data?.onAppPrivateCommand,
-      scribbleEnabled: data?.scribbleEnabled ?? true,
+      stylusHandwritingEnabled: data?.scribbleEnabled ?? true,
       selectionHeightStyle:
           data?.selectionHeightStyle ?? ui.BoxHeightStyle.tight,
       selectionWidthStyle: data?.selectionWidthStyle ?? ui.BoxWidthStyle.tight,

@@ -556,7 +556,7 @@ class PlatformTextField
           enableIMEPersonalizedLearning ??
           true,
       clipBehavior: data?.clipBehavior ?? clipBehavior,
-      scribbleEnabled: data?.scribbleEnabled ?? scribbleEnabled,
+      stylusHandwritingEnabled: data?.scribbleEnabled ?? scribbleEnabled,
       contextMenuBuilder: data?.contextMenuBuilder ??
           contextMenuBuilder ??
           _defaultMaterialContextMenuBuilder,
@@ -662,7 +662,7 @@ class PlatformTextField
           true,
       textDirection: data?.textDirection,
       clipBehavior: data?.clipBehavior ?? clipBehavior,
-      scribbleEnabled: data?.scribbleEnabled ?? scribbleEnabled,
+      stylusHandwritingEnabled: data?.scribbleEnabled ?? scribbleEnabled,
       contextMenuBuilder: data?.contextMenuBuilder ??
           contextMenuBuilder ??
           _defaultCupertinoContextMenuBuilder,
