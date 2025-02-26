@@ -11,7 +11,7 @@ import 'package:flutter/material.dart'
         AdaptiveTextSelectionToolbar,
         InputCounterWidgetBuilder,
         InputDecoration,
-        MaterialStatesController,
+        WidgetStatesController,
         TextFormField;
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
@@ -139,7 +139,7 @@ class MaterialTextFormFieldData extends _BaseData {
   final UndoHistoryController? undoController;
   final Color? cursorErrorColor;
   final bool? onTapAlwaysCalled;
-  final MaterialStatesController? statesController;
+  final WidgetStatesController? statesController;
 
   MaterialTextFormFieldData({
     super.widgetKey,

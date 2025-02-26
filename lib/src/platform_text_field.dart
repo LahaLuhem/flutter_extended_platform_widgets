@@ -19,7 +19,7 @@ import 'package:flutter/material.dart'
         AdaptiveTextSelectionToolbar,
         InputCounterWidgetBuilder,
         InputDecoration,
-        MaterialStatesController,
+        WidgetStatesController,
         TextField;
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
@@ -250,7 +250,7 @@ class MaterialTextFieldData extends _BaseData {
   final bool? canRequestFocus;
   final Color? cursorErrorColor;
   final bool? onTapAlwaysCalled;
-  final MaterialStatesController? statesController;
+  final WidgetStatesController? statesController;
 }
 
 class CupertinoTextFieldData extends _BaseData {

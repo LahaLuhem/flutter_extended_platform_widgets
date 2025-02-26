@@ -7,7 +7,7 @@
 import 'package:flutter/cupertino.dart' show CupertinoSwitch;
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart'
-    show MaterialStateProperty, MaterialTapTargetSize, Switch;
+    show WidgetStateProperty, MaterialTapTargetSize, Switch;
 import 'package:flutter/widgets.dart';
 
 import 'platform.dart';
@@ -76,13 +76,13 @@ class MaterialSwitchData extends _BaseData {
   final ImageErrorListener? onActiveThumbImageError;
   final ImageErrorListener? onInactiveThumbImageError;
   final MouseCursor? mouseCursor;
-  final MaterialStateProperty<Color?>? overlayColor;
+  final WidgetStateProperty<Color?>? overlayColor;
   final double? splashRadius;
-  final MaterialStateProperty<Color?>? thumbColor;
-  final MaterialStateProperty<Color?>? trackColor;
-  final MaterialStateProperty<Icon?>? thumbIcon;
-  final MaterialStateProperty<Color?>? trackOutlineColor;
-  final MaterialStateProperty<double?>? trackOutlineWidth;
+  final WidgetStateProperty<Color?>? thumbColor;
+  final WidgetStateProperty<Color?>? trackColor;
+  final WidgetStateProperty<Icon?>? thumbIcon;
+  final WidgetStateProperty<Color?>? trackOutlineColor;
+  final WidgetStateProperty<double?>? trackOutlineWidth;
 }
 
 class CupertinoSwitchData extends _BaseData {

@@ -10,7 +10,7 @@ import 'package:flutter/cupertino.dart'
         CupertinoColors,
         OverlayVisibilityMode,
         CupertinoIcons;
-import 'package:flutter/material.dart' show MaterialStateProperty, SearchBar;
+import 'package:flutter/material.dart' show WidgetStateProperty, SearchBar;
 import 'package:flutter/services.dart' show TextCapitalization, TextInputAction;
 import 'package:flutter/widgets.dart';
 
@@ -75,16 +75,16 @@ class MaterialSearchBarData extends _BaseData {
   final Widget? leading;
   final Iterable<Widget>? trailing;
   final BoxConstraints? constraints;
-  final MaterialStateProperty<double?>? elevation;
-  final MaterialStateProperty<Color?>? shadowColor;
-  final MaterialStateProperty<Color?>? surfaceTintColor;
-  final MaterialStateProperty<Color?>? overlayColor;
-  final MaterialStateProperty<BorderSide?>? side;
-  final MaterialStateProperty<OutlinedBorder?>? shape;
-  final MaterialStateProperty<EdgeInsetsGeometry?>? padding;
-  final MaterialStateProperty<Color?>? backgroundColor;
-  final MaterialStateProperty<TextStyle?>? hintStyle;
-  final MaterialStateProperty<TextStyle?>? textStyle;
+  final WidgetStateProperty<double?>? elevation;
+  final WidgetStateProperty<Color?>? shadowColor;
+  final WidgetStateProperty<Color?>? surfaceTintColor;
+  final WidgetStateProperty<Color?>? overlayColor;
+  final WidgetStateProperty<BorderSide?>? side;
+  final WidgetStateProperty<OutlinedBorder?>? shape;
+  final WidgetStateProperty<EdgeInsetsGeometry?>? padding;
+  final WidgetStateProperty<Color?>? backgroundColor;
+  final WidgetStateProperty<TextStyle?>? hintStyle;
+  final WidgetStateProperty<TextStyle?>? textStyle;
   final String? hintText;
   final ValueChanged<String>? onSubmitted;
   final TextCapitalization? textCapitalization;
@@ -221,16 +221,16 @@ class PlatformSearchBar
 
       backgroundColor: data?.backgroundColor ??
           (backgroundColor != null
-              ? MaterialStateProperty.all<Color>(backgroundColor)
+              ? WidgetStateProperty.all<Color>(backgroundColor)
               : null),
       hintText: data?.hintText ?? hintText,
       hintStyle: data?.hintStyle ??
           (hintStyle != null
-              ? MaterialStateProperty.all<TextStyle>(hintStyle)
+              ? WidgetStateProperty.all<TextStyle>(hintStyle)
               : null),
       textStyle: data?.textStyle ??
           (textStyle != null
-              ? MaterialStateProperty.all<TextStyle>(textStyle)
+              ? WidgetStateProperty.all<TextStyle>(textStyle)
               : null),
       autoFocus: data?.autofocus ?? autoFocus ?? false,
       keyboardType: data?.keyboardType ?? keyboardType,

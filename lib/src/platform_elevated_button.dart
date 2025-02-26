@@ -7,7 +7,7 @@
 import 'package:flutter/cupertino.dart'
     show CupertinoButton, CupertinoColors, CupertinoTheme;
 import 'package:flutter/material.dart'
-    show ElevatedButton, ButtonStyle, MaterialStatesController;
+    show ElevatedButton, ButtonStyle, WidgetStatesController;
 import 'package:flutter/widgets.dart';
 
 import 'platform.dart';
@@ -51,7 +51,7 @@ class MaterialElevatedButtonData extends _BaseData {
   final Widget? icon;
   final ValueChanged<bool>? onHover;
   final ValueChanged<bool>? onFocusChange;
-  final MaterialStatesController? statesController;
+  final WidgetStatesController? statesController;
 }
 
 class CupertinoElevatedButtonData extends _BaseData {

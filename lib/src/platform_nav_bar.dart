@@ -14,7 +14,7 @@ import 'package:flutter/material.dart'
         NavigationBar,
         NavigationDestination,
         NavigationDestinationLabelBehavior,
-        MaterialStateProperty,
+        WidgetStateProperty,
         Theme;
 import 'package:flutter/widgets.dart';
 
@@ -97,7 +97,7 @@ class MaterialNavigationBarData {
   final int? selectedIndex;
   final Color? shadowColor;
   final Color? surfaceTintColor;
-  final MaterialStateProperty<Color?>? overlayColor;
+  final WidgetStateProperty<Color?>? overlayColor;
 }
 
 class MaterialNavBarData extends _BaseData {

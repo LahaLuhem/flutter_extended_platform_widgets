@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart'
     show CupertinoActionSheet, CupertinoActionSheetAction;
 import 'package:flutter/material.dart'
     show
-        MaterialStateProperty,
+        WidgetStateProperty,
         PopupMenuButton,
         PopupMenuCanceled,
         PopupMenuDivider,
@@ -53,7 +53,7 @@ class MaterialPopupMenuOptionData extends _BaseData {
   final TextStyle? textStyle;
   final bool withDivider;
   final double dividerHeight;
-  final MaterialStateProperty<TextStyle?>? labelTextStyle;
+  final WidgetStateProperty<TextStyle?>? labelTextStyle;
 
   MaterialPopupMenuOptionData({
     super.key,

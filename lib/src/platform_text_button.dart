@@ -7,7 +7,7 @@
 import 'package:flutter/cupertino.dart'
     show CupertinoButton, CupertinoColors, CupertinoTheme;
 import 'package:flutter/material.dart'
-    show TextButton, ButtonStyle, MaterialStatesController;
+    show TextButton, ButtonStyle, WidgetStatesController;
 import 'package:flutter/widgets.dart';
 
 import 'platform.dart';
@@ -52,7 +52,7 @@ class MaterialTextButtonData extends _BaseData {
   final Widget? icon;
   final ValueChanged<bool>? onHover;
   final ValueChanged<bool>? onFocusChange;
-  final MaterialStatesController? statesController;
+  final WidgetStatesController? statesController;
   final bool? isSemanticButton;
 }
 

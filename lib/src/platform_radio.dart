@@ -6,7 +6,7 @@
 
 import 'package:flutter/cupertino.dart' show CupertinoRadio;
 import 'package:flutter/material.dart'
-    show Radio, MaterialTapTargetSize, MaterialStateProperty, VisualDensity;
+    show Radio, MaterialTapTargetSize, WidgetStateProperty, VisualDensity;
 import 'package:flutter/widgets.dart';
 
 import 'platform.dart';
@@ -59,11 +59,11 @@ class MaterialRadioData extends _BaseData {
   });
   final MouseCursor? mouseCursor;
   final Color? hoverColor;
-  final MaterialStateProperty<Color?>? overlayColor;
+  final WidgetStateProperty<Color?>? overlayColor;
   final double? splashRadius;
   final MaterialTapTargetSize? materialTapTargetSize;
   final VisualDensity? visualDensity;
-  final MaterialStateProperty<Color?>? fillColor;
+  final WidgetStateProperty<Color?>? fillColor;
 }
 
 class CupertinoRadioData extends _BaseData {
@@ -138,7 +138,7 @@ class PlatformRadio<T> extends PlatformWidgetBase<CupertinoRadio, Radio> {
       onChanged: data?.onChanged ?? onChanged,
       toggleable: data?.toggleable ?? toggleable,
       activeColor: data?.activeColor ?? activeColor,
-      fillColor: data?.fillColor ?? MaterialStateProperty.all(fillColor),
+      fillColor: data?.fillColor ?? WidgetStateProperty.all(fillColor),
       focusColor: data?.focusColor ?? focusColor,
       autofocus: data?.autofocus ?? autofocus,
       focusNode: data?.focusNode ?? focusNode,

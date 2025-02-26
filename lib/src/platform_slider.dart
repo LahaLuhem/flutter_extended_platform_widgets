@@ -7,7 +7,7 @@
 import 'package:flutter/cupertino.dart' show CupertinoColors, CupertinoSlider;
 import 'package:flutter/material.dart'
     show
-        MaterialStateProperty,
+        WidgetStateProperty,
         SemanticFormatterCallback,
         Slider,
         SliderInteraction;
@@ -72,7 +72,7 @@ class MaterialSliderData extends _BaseData {
   final FocusNode? focusNode;
   final MouseCursor? mouseCursor;
   final bool? autofocus;
-  final MaterialStateProperty<Color?>? overlayColor;
+  final WidgetStateProperty<Color?>? overlayColor;
   final Color? secondaryActiveColor;
   final double? secondaryTrackValue;
   final SliderInteraction? allowedInteraction;
