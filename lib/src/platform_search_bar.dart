@@ -8,14 +8,13 @@ import 'package:fluent_ui/fluent_ui.dart' show AutoSuggestBox;
 import 'package:flutter/cupertino.dart'
     show
         CupertinoColors,
-        OverlayVisibilityMode,
-        CupertinoIcons;
+        CupertinoIcons,
+        CupertinoSearchTextField,
+        OverlayVisibilityMode;
 import 'package:flutter/material.dart' show WidgetStateProperty, SearchBar;
 import 'package:flutter/services.dart' show TextCapitalization, TextInputAction;
 import 'package:flutter/widgets.dart';
-
-import 'package:flutter_extended_platform_widgets/src/platform.dart';
-import 'package:flutter_extended_platform_widgets/src/widget_base.dart';
+import 'package:flutter_extended_platform_widgets/flutter_extended_platform_widgets.dart';
 
 abstract class _BaseData {
   final Key? widgetKey;
@@ -25,6 +24,8 @@ abstract class _BaseData {
   final ValueChanged<String>? onChanged;
   final TextInputType? keyboardType;
   final bool? autofocus;
+
+  final bool? enabled;
 
   const _BaseData({
     this.widgetKey,
@@ -36,15 +37,6 @@ abstract class _BaseData {
     this.autofocus,
     this.enabled,
   });
-
-  final Key? widgetKey;
-  final FocusNode? focusNode;
-  final TextEditingController? controller;
-  final void Function()? onTap;
-  final ValueChanged<String>? onChanged;
-  final TextInputType? keyboardType;
-  final bool? autofocus;
-  final bool? enabled;
 }
 
 class MaterialSearchBarData extends _BaseData {
@@ -200,6 +192,7 @@ class PlatformSearchBar extends PlatformWidgetBase<
     SearchBar,
     SearchBar> {
   final Key? widgetKey;
+
   //Common
   final FocusNode? focusNode;
   final TextEditingController? controller;

@@ -3,7 +3,6 @@ import 'package:flutter/cupertino.dart'
     show CupertinoActionSheet, CupertinoActionSheetAction;
 import 'package:flutter/material.dart'
     show
-        WidgetStateProperty,
         PopupMenuButton,
         PopupMenuCanceled,
         PopupMenuDivider,
@@ -11,11 +10,10 @@ import 'package:flutter/material.dart'
         PopupMenuItem,
         PopupMenuItemBuilder,
         PopupMenuPosition,
+        WidgetStateProperty,
+        kMinInteractiveDimension,
         kMinInteractiveDimension;
-
-import 'package:flutter_extended_platform_widgets/src/platform.dart';
-import 'package:flutter_extended_platform_widgets/src/platform_widget.dart';
-import 'package:flutter_extended_platform_widgets/src/widget_base.dart';
+import 'package:flutter_extended_platform_widgets/flutter_extended_platform_widgets.dart';
 
 const double _kMenuDividerHeight = 16;
 
@@ -31,6 +29,7 @@ class PopupMenuOption {
     this.fuchsia,
     this.web,
   });
+
   final String? label;
   final void Function(PopupMenuOption)? onTap;
 
@@ -48,6 +47,7 @@ abstract class _BaseData {
     this.key,
     this.child,
   });
+
   final Key? key;
   final Widget? child;
 }
@@ -76,15 +76,6 @@ class MaterialPopupMenuOptionData extends _BaseData {
     this.dividerHeight = _kMenuDividerHeight,
     this.labelTextStyle,
   });
-  final bool? enabled;
-  final double? height;
-  final MouseCursor? mouseCursor;
-  final VoidCallback? onTap;
-  final EdgeInsets? padding;
-  final TextStyle? textStyle;
-  final bool withDivider;
-  final double dividerHeight;
-  final MaterialStateProperty<TextStyle?>? labelTextStyle;
 }
 
 class CupertinoPopupMenuOptionData extends _BaseData {
@@ -95,6 +86,7 @@ class CupertinoPopupMenuOptionData extends _BaseData {
     this.isDefaultAction,
     this.isDestructiveAction,
   });
+
   final VoidCallback? onPressed;
   final bool? isDefaultAction;
   final bool? isDestructiveAction;
@@ -113,6 +105,7 @@ class FluentPopupMenuOptionData extends _BaseData {
     this.withDivider = false,
     this.dividerHeight = _kMenuDividerHeight,
   });
+
   final bool? enabled;
   final double? height;
   final MouseCursor? mouseCursor;
@@ -189,6 +182,7 @@ class CupertinoPopupMenuData {
     this.actions,
     this.cancelButtonData,
   });
+
   final Key? key;
   final Widget? title;
   final Widget? message;
@@ -206,6 +200,7 @@ class CupertinoPopupMenuCancelButtonData {
     this.isDefaultAction,
     this.isDestructiveAction,
   });
+
   final Key? key;
   final Widget child;
   final VoidCallback? onPressed;
@@ -221,6 +216,7 @@ class FluentPopupMenuData {
     this.iconSize,
     this.initialValue,
   });
+
   final Key? key;
   final Widget? icon;
   final double? elevation;
@@ -241,6 +237,7 @@ class PlatformPopupMenu extends StatelessWidget {
     this.web,
     super.key,
   });
+
   final List<PopupMenuOption> options;
   final Widget icon;
 

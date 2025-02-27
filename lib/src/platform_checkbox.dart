@@ -5,9 +5,9 @@
  */
 
 import 'package:fluent_ui/fluent_ui.dart' as fluent;
-import 'package:flutter/cupertino.dart' show CupertinoCheckbox;
+import 'package:flutter/cupertino.dart' show CupertinoCheckbox, CupertinoColors;
 import 'package:flutter/material.dart'
-    show Checkbox, MaterialStateProperty, MaterialTapTargetSize, VisualDensity;
+    show Checkbox, MaterialTapTargetSize, VisualDensity, WidgetStateProperty;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_extended_platform_widgets/src/platform.dart';
 import 'package:flutter_extended_platform_widgets/src/widget_base.dart';
@@ -145,6 +145,7 @@ class PlatformCheckbox extends PlatformWidgetBase<Checkbox, CupertinoCheckbox,
     this.fuchsia,
     this.web,
   });
+
   //Common
   final Key? widgetKey;
   final bool? value;

@@ -4,14 +4,14 @@
  * See LICENSE for distribution and usage details.
  */
 
+import 'package:fluent_ui/fluent_ui.dart' show ToggleSwitch;
 import 'package:flutter/cupertino.dart' show CupertinoSwitch;
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart'
     show WidgetStateProperty, MaterialTapTargetSize, Switch;
 import 'package:flutter/widgets.dart';
-import 'package:fluent_ui/fluent_ui.dart' show ToggleSwitch;
 import 'package:flutter_extended_platform_widgets/src/extensions/macos_color_extensions.dart';
-import 'package:macos_ui/macos_ui.dart' show MacosColor, MacosSwitch;
+import 'package:macos_ui/macos_ui.dart' show MacosSwitch;
 
 import 'platform.dart';
 import 'widget_base.dart';
@@ -98,6 +98,7 @@ class CupertinoSwitchData extends _BaseData {
     super.focusNode,
     super.autofocus,
     super.onFocusChange,
+    this.trackColor,
     this.inactiveTrackColor,
     this.thumbColor,
     this.applyTheme,
@@ -112,6 +113,7 @@ class CupertinoSwitchData extends _BaseData {
   final Color? focusColor;
   final Color? offLabelColor;
   final Color? onLabelColor;
+  final Color? trackColor;
 }
 
 class FluentSwitchData extends _BaseData {

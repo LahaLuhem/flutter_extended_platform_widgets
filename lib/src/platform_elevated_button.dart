@@ -10,7 +10,6 @@ import 'package:flutter/cupertino.dart'
 import 'package:flutter/material.dart'
     show ElevatedButton, ButtonStyle, WidgetStatesController;
 import 'package:flutter/widgets.dart';
-
 import 'package:flutter_extended_platform_widgets/src/platform.dart';
 import 'package:flutter_extended_platform_widgets/src/widget_base.dart';
 
@@ -106,7 +105,7 @@ class FluentElevatedButtonData extends _BaseData {
   final Widget? icon;
   final ValueChanged<bool>? onHover;
   final ValueChanged<bool>? onFocusChange;
-  final MaterialStatesController? statesController;
+  final WidgetStatesController? statesController;
 }
 
 class PlatformElevatedButton extends PlatformWidgetBase<ElevatedButton, Widget,
@@ -127,6 +126,7 @@ class PlatformElevatedButton extends PlatformWidgetBase<ElevatedButton, Widget,
     this.fuchsia,
     this.web,
   });
+
   final Key? widgetKey;
 
   final VoidCallback? onPressed;
