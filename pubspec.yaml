@@ -32,10 +32,10 @@ dependencies:
     sdk: flutter
 
   # UI packages
-  fluent_ui: ^4.8.7
-  fluentui_system_icons: ^1.1.241
+  fluent_ui: ^4.11.2
+  fluentui_system_icons: ^1.1.273
 
-  macos_ui: ^2.0.7
+  macos_ui: ^2.1.10
 
   cupertino_icons: ^1.0.8
   cupertino_progress_bar: ^0.2.0

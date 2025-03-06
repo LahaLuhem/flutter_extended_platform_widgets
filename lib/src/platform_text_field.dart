@@ -851,7 +851,10 @@ class PlatformTextField
           textCapitalization ??
           TextCapitalization.none,
       textInputAction: data?.textInputAction ?? textInputAction,
-      decoration: data?.decoration,
+      decoration:
+          data?.decoration != null
+              ? WidgetStatePropertyAll(data!.decoration!)
+              : null,
       textDirection: data?.textDirection,
       dragStartBehavior:
           data?.dragStartBehavior ??

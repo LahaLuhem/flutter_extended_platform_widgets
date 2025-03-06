@@ -703,7 +703,10 @@ class PlatformTextFormField
       initialValue: data?.initialValue ?? initialValue,
       placeholder: hintText,
       focusNode: data?.focusNode ?? focusNode,
-      decoration: data?.decoration,
+      decoration:
+          data?.decoration != null
+              ? WidgetStatePropertyAll(data!.decoration!)
+              : null,
       keyboardType: data?.keyboardType ?? keyboardType,
       textCapitalization:
           data?.textCapitalization ??
