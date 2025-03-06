@@ -6,6 +6,7 @@
 
 import 'dart:ui';
 
+import 'package:fluent_ui/fluent_ui.dart' as fluent;
 import 'package:flutter/cupertino.dart'
     show
         CupertinoDynamicColor,
@@ -17,7 +18,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart'
     show Theme, ThemeData, Colors, showDialog, showModalBottomSheet;
 import 'package:flutter/widgets.dart';
-import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'package:flutter_extended_platform_widgets/flutter_extended_platform_widgets.dart';
 
 const double _defaultScrollControlDisabledMaxHeightRatio = 9.0 / 16.0;
 
@@ -54,41 +55,75 @@ PlatformStyle _platformStyle(BuildContext context) {
   final platformStyle = PlatformProvider.of(context)?.settings.platformStyle;
 
   if (platform == null && kIsWeb) {
-    return platformStyle?.web ?? PlatformStyle.Material;
+    return platformStyle?.web ?? PlatformStyle.material;
   }
 
   switch (platform ?? Theme.of(context).platform) {
     case TargetPlatform.android:
-      return platformStyle?.android ?? PlatformStyle.Material;
+      return platformStyle?.android ?? PlatformStyle.material;
     case TargetPlatform.fuchsia:
-      return platformStyle?.fuchsia ?? PlatformStyle.Material;
+      return platformStyle?.fuchsia ?? PlatformStyle.fuchsia;
     case TargetPlatform.iOS:
-      return platformStyle?.ios ?? PlatformStyle.Cupertino;
+      return platformStyle?.ios ?? PlatformStyle.cupertino;
     case TargetPlatform.linux:
-      return platformStyle?.linux ?? PlatformStyle.Material;
+      return platformStyle?.linux ?? PlatformStyle.linux;
     case TargetPlatform.macOS:
-      return platformStyle?.macos ?? PlatformStyle.Cupertino;
+      return platformStyle?.macos ?? PlatformStyle.macos;
     case TargetPlatform.windows:
-      return platformStyle?.windows ?? PlatformStyle.Material;
+      return platformStyle?.windows ?? PlatformStyle.windows;
   }
 }
 
-bool isMaterial(BuildContext context) {
-  return _platformStyle(context) == PlatformStyle.Material;
-}
+bool isMaterial(BuildContext context) =>
+    _platformStyle(context) == PlatformStyle.material;
 
-bool isCupertino(BuildContext context) {
-  return _platformStyle(context) == PlatformStyle.Cupertino;
-}
+bool isCupertino(BuildContext context) =>
+    _platformStyle(context) == PlatformStyle.cupertino;
+
+bool isWindows(BuildContext context) =>
+    PlatformStyle.windows == _platformStyle(context);
+
+bool isMacos(BuildContext context) =>
+    _platformStyle(context) == PlatformStyle.macos;
+
+bool isLinux(BuildContext context) =>
+    _platformStyle(context) == PlatformStyle.linux;
+
+bool isFuchsia(BuildContext context) =>
+    _platformStyle(context) == PlatformStyle.fuchsia;
+
+bool isWeb(BuildContext context) =>
+    _platformStyle(context) == PlatformStyle.web;
 
 T platformThemeData<T>(
   BuildContext context, {
   required T Function(ThemeData theme) material,
   required T Function(CupertinoThemeData theme) cupertino,
+  required T Function(fluent.FluentThemeData theme) windows,
+  required T Function(CupertinoThemeData theme) macos,
+  required T Function(ThemeData theme) linux,
+  required T Function(ThemeData theme) fuchsia,
+  required T Function(ThemeData theme) web,
 }) {
-  return isMaterial(context)
-      ? material(Theme.of(context))
-      : cupertino(CupertinoTheme.of(context));
+  if (isMaterial(context)) {
+    return material(Theme.of(context));
+  } else if (isCupertino(context)) {
+    return cupertino(CupertinoTheme.of(context));
+  } else if (isWindows(context)) {
+    return windows(fluent.FluentTheme.of(context));
+  } else if (isMacos(context)) {
+    return macos(CupertinoTheme.of(context));
+  } else if (isLinux(context)) {
+    return linux(Theme.of(context));
+  } else if (isFuchsia(context)) {
+    return fuchsia(Theme.of(context));
+  } else if (isWeb(context)) {
+    return web(Theme.of(context));
+  }
+
+  return throw UnsupportedError(
+    'This platform is not supported: $defaultTargetPlatform',
+  );
 }
 
 PlatformTarget platform(BuildContext context) {
@@ -203,9 +238,7 @@ Future<T?> showPlatformDialog<T>({
 }
 
 abstract class _ModalSheetBaseData {
-  _ModalSheetBaseData({
-    this.anchorPoint,
-  });
+  _ModalSheetBaseData({this.anchorPoint});
 
   final Offset? anchorPoint;
 }
@@ -299,7 +332,7 @@ Future<T?> showPlatformModalSheet<T>({
       barrierLabel: material?.barrierLabel,
       scrollControlDisabledMaxHeightRatio:
           material?.scrollControlDisabledMaxHeightRatio ??
-              _defaultScrollControlDisabledMaxHeightRatio,
+          _defaultScrollControlDisabledMaxHeightRatio,
       showDragHandle: material?.showDragHandle,
       sheetAnimationStyle: material?.sheetAnimationStyle,
     );

@@ -4,6 +4,7 @@
  * See LICENSE for distribution and usage details.
  */
 
+import 'package:fluent_ui/fluent_ui.dart' as fluent;
 import 'package:flutter/cupertino.dart'
     show CupertinoButton, CupertinoButtonSize, CupertinoColors, CupertinoTheme;
 import 'package:flutter/material.dart'
@@ -16,12 +17,7 @@ import 'widget_base.dart';
 const double _kMinInteractiveDimensionCupertino = 44.0;
 
 abstract class _BaseData {
-  _BaseData({
-    this.widgetKey,
-    this.child,
-    this.onPressed,
-    this.onLongPress,
-  });
+  _BaseData({this.widgetKey, this.child, this.onPressed, this.onLongPress});
 
   final Key? widgetKey;
   final Widget? child;
@@ -95,8 +91,44 @@ class CupertinoElevatedButtonData extends _BaseData {
   final bool originalStyle;
 }
 
+class FluentElevatedButtonData extends _BaseData {
+  FluentElevatedButtonData({
+    super.widgetKey,
+    super.child,
+    super.onPressed,
+    this.onLongPress,
+    this.focusNode,
+    this.style,
+    this.autofocus,
+    this.clipBehavior,
+    this.icon,
+    this.onHover,
+    this.onFocusChange,
+    this.statesController,
+  });
+
+  final VoidCallback? onLongPress;
+  final FocusNode? focusNode;
+  final fluent.ButtonStyle? style;
+  final bool? autofocus;
+  final Clip? clipBehavior;
+  final Widget? icon;
+  final ValueChanged<bool>? onHover;
+  final ValueChanged<bool>? onFocusChange;
+  final WidgetStatesController? statesController;
+}
+
 class PlatformElevatedButton
-    extends PlatformWidgetBase<Widget, ElevatedButton> {
+    extends
+        PlatformWidgetBase<
+          ElevatedButton,
+          Widget,
+          fluent.Button,
+          Widget,
+          ElevatedButton,
+          ElevatedButton,
+          ElevatedButton
+        > {
   final Key? widgetKey;
 
   final VoidCallback? onPressed;
@@ -109,8 +141,13 @@ class PlatformElevatedButton
 
   final PlatformBuilder<CupertinoElevatedButtonData>? cupertino;
   final PlatformBuilder<MaterialElevatedButtonData>? material;
+  final PlatformBuilder<FluentElevatedButtonData>? windows;
+  final PlatformBuilder<CupertinoElevatedButtonData>? macos;
+  final PlatformBuilder<MaterialElevatedButtonData>? linux;
+  final PlatformBuilder<MaterialElevatedButtonData>? fuchsia;
+  final PlatformBuilder<MaterialElevatedButtonData>? web;
 
-  PlatformElevatedButton({
+  const PlatformElevatedButton({
     super.key,
     this.widgetKey,
     this.onPressed,
@@ -121,6 +158,11 @@ class PlatformElevatedButton
     this.onLongPress,
     this.material,
     this.cupertino,
+    this.windows,
+    this.macos,
+    this.linux,
+    this.fuchsia,
+    this.web,
   });
 
   @override
@@ -139,7 +181,8 @@ class PlatformElevatedButton
         autofocus: data?.autofocus ?? false,
         clipBehavior: data?.clipBehavior ?? Clip.none,
         focusNode: data?.focusNode,
-        style: data?.style ??
+        style:
+            data?.style ??
             ElevatedButton.styleFrom(
               backgroundColor: color,
               padding: padding,
@@ -160,7 +203,8 @@ class PlatformElevatedButton
       autofocus: data?.autofocus ?? false,
       clipBehavior: data?.clipBehavior ?? Clip.none,
       focusNode: data?.focusNode,
-      style: data?.style ??
+      style:
+          data?.style ??
           ElevatedButton.styleFrom(
             backgroundColor: color,
             padding: padding,
@@ -180,7 +224,8 @@ class PlatformElevatedButton
         key: data?.widgetKey ?? widgetKey,
         child: data?.child ?? child!,
         onPressed: data?.onPressed ?? onPressed,
-        borderRadius: data?.borderRadius ??
+        borderRadius:
+            data?.borderRadius ??
             const BorderRadius.all(const Radius.circular(8.0)),
         minSize: data?.minSize ?? _kMinInteractiveDimensionCupertino,
         padding: data?.padding ?? padding,
@@ -201,7 +246,8 @@ class PlatformElevatedButton
         key: data?.widgetKey ?? widgetKey,
         child: data?.child ?? child!,
         onPressed: data?.onPressed ?? onPressed,
-        borderRadius: data?.borderRadius ??
+        borderRadius:
+            data?.borderRadius ??
             const BorderRadius.all(const Radius.circular(8.0)),
         minSize: data?.minSize ?? _kMinInteractiveDimensionCupertino,
         padding: data?.padding ?? padding,
@@ -227,4 +273,39 @@ class PlatformElevatedButton
       return button;
     }
   }
+
+  @override
+  fluent.Button createWindowsWidget(BuildContext context) {
+    final data = windows?.call(context, platform(context));
+
+    final icon = data?.icon;
+
+    assert(icon != null || data?.child != null || child != null);
+    return fluent.FilledButton(
+      key: data?.widgetKey ?? widgetKey,
+      onPressed: data?.onPressed ?? onPressed,
+      onLongPress: data?.onLongPress,
+      autofocus: data?.autofocus ?? false,
+      focusNode: data?.focusNode,
+      style: data?.style,
+      child: (icon != null) ? icon : data?.child ?? child!,
+    );
+  }
+
+  //Todo(mehul): change themes here
+  @override
+  Widget createMacosWidget(BuildContext context) =>
+      createCupertinoWidget(context);
+
+  @override
+  ElevatedButton createLinuxWidget(BuildContext context) =>
+      createMaterialWidget(context);
+
+  @override
+  ElevatedButton createFuchsiaWidget(BuildContext context) =>
+      createMaterialWidget(context);
+
+  @override
+  ElevatedButton createWebWidget(BuildContext context) =>
+      createMaterialWidget(context);
 }

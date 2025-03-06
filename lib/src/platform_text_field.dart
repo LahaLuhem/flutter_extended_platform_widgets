@@ -5,8 +5,8 @@
  */
 
 import 'dart:ui' as ui show BoxHeightStyle, BoxWidthStyle;
-import 'package:fluent_ui/fluent_ui.dart'
-    show FluentTextSelectionToolbar, TextBox;
+
+import 'package:fluent_ui/fluent_ui.dart' as fluent;
 import 'package:flutter/cupertino.dart'
     show
         CupertinoAdaptiveTextSelectionToolbar,
@@ -24,8 +24,8 @@ import 'package:flutter/material.dart'
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
-import 'package:flutter_extended_platform_widgets/src/platform.dart';
-import 'package:flutter_extended_platform_widgets/src/widget_base.dart';
+import 'platform.dart';
+import 'widget_base.dart';
 
 const BorderSide _kDefaultRoundedBorderSide = BorderSide(
   color: CupertinoDynamicColor.withBrightness(
@@ -48,7 +48,7 @@ const BoxDecoration kDefaultRoundedBorderDecoration = BoxDecoration(
     darkColor: CupertinoColors.black,
   ),
   border: _kDefaultRoundedBorder,
-  borderRadius: BorderRadius.all(Radius.circular(5)),
+  borderRadius: BorderRadius.all(Radius.circular(5.0)),
 );
 
 abstract class _BaseData {
@@ -393,7 +393,7 @@ class FluentTextFieldData extends _BaseData {
     super.selectionControls,
     super.enableIMEPersonalizedLearning,
     super.clipBehavior,
-    super.scribbleEnabled,
+    super.stylusHandwritingEnabled,
     super.contextMenuBuilder,
     super.onTapOutside,
     super.spellCheckConfiguration,
@@ -407,14 +407,17 @@ class FluentTextFieldData extends _BaseData {
   final BoxDecoration? decoration;
 }
 
-class PlatformTextField extends PlatformWidgetBase<
-    TextField,
-    CupertinoTextField,
-    TextBox,
-    CupertinoTextField,
-    TextField,
-    TextField,
-    TextField> {
+class PlatformTextField
+    extends
+        PlatformWidgetBase<
+          TextField,
+          CupertinoTextField,
+          fluent.TextBox,
+          CupertinoTextField,
+          TextField,
+          TextField,
+          TextField
+        > {
   final Key? widgetKey;
 
   final PlatformBuilder<MaterialTextFieldData>? material;
@@ -491,26 +494,23 @@ class PlatformTextField extends PlatformWidgetBase<
   static Widget _defaultMaterialContextMenuBuilder(
     BuildContext context,
     EditableTextState editableTextState,
-  ) =>
-      AdaptiveTextSelectionToolbar.editableText(
-        editableTextState: editableTextState,
-      );
+  ) => AdaptiveTextSelectionToolbar.editableText(
+    editableTextState: editableTextState,
+  );
 
   static Widget _defaultCupertinoContextMenuBuilder(
     BuildContext context,
     EditableTextState editableTextState,
-  ) =>
-      CupertinoAdaptiveTextSelectionToolbar.editableText(
-        editableTextState: editableTextState,
-      );
+  ) => CupertinoAdaptiveTextSelectionToolbar.editableText(
+    editableTextState: editableTextState,
+  );
 
   static Widget _defaultFluentContextMenuBuilder(
     BuildContext context,
     EditableTextState editableTextState,
-  ) =>
-      FluentTextSelectionToolbar.editableText(
-        editableTextState: editableTextState,
-      );
+  ) => fluent.FluentTextSelectionToolbar.editableText(
+    editableTextState: editableTextState,
+  );
 
   const PlatformTextField({
     super.key,
@@ -578,20 +578,22 @@ class PlatformTextField extends PlatformWidgetBase<
     this.linux,
     this.fuchsia,
     this.web,
-  }) : keyboardType = keyboardType ??
-            (maxLines == 1 ? TextInputType.text : TextInputType.multiline);
+  }) : keyboardType =
+           keyboardType ??
+           (maxLines == 1 ? TextInputType.text : TextInputType.multiline);
 
   @override
   TextField createMaterialWidget(BuildContext context) {
     final data = material?.call(context, platform(context));
 
     final hintText = this.hintText;
-    final decoration = hintText == null
-        ? (data?.decoration ?? const InputDecoration())
-        : _inputDecorationWithHint(
-            hintText,
-            data?.decoration ?? const InputDecoration(),
-          );
+    final decoration =
+        hintText == null
+            ? (data?.decoration ?? const InputDecoration())
+            : _inputDecorationWithHint(
+              hintText,
+              data?.decoration ?? const InputDecoration(),
+            );
 
     return TextField(
       key: data?.widgetKey ?? widgetKey,
@@ -616,21 +618,24 @@ class PlatformTextField extends PlatformWidgetBase<
           data?.scrollPadding ?? scrollPadding ?? const EdgeInsets.all(20),
       style: data?.style ?? style,
       textAlign: data?.textAlign ?? textAlign ?? TextAlign.start,
-      textCapitalization: data?.textCapitalization ??
+      textCapitalization:
+          data?.textCapitalization ??
           textCapitalization ??
           TextCapitalization.none,
       textInputAction: data?.textInputAction ?? textInputAction,
       decoration: decoration,
       textDirection: data?.textDirection,
       buildCounter: data?.buildCounter,
-      dragStartBehavior: data?.dragStartBehavior ??
+      dragStartBehavior:
+          data?.dragStartBehavior ??
           dragStartBehavior ??
           DragStartBehavior.start,
       expands: data?.expands ?? expands ?? false,
       minLines: data?.minLines ?? minLines,
       scrollPhysics: data?.scrollPhysics ?? scrollPhysics,
       strutStyle: data?.strutStyle ?? strutStyle,
-      enableInteractiveSelection: data?.enableInteractiveSelection ??
+      enableInteractiveSelection:
+          data?.enableInteractiveSelection ??
           enableInteractiveSelection ??
           true,
       scrollController: data?.scrollController ?? scrollController,
@@ -641,10 +646,12 @@ class PlatformTextField extends PlatformWidgetBase<
       enableSuggestions: data?.enableSuggestions ?? true,
       smartQuotesType: data?.smartQuotesType ?? smartQuotesType,
       smartDashesType: data?.smartDashesType ?? smartDashesType,
-      selectionHeightStyle: data?.selectionHeightStyle ??
+      selectionHeightStyle:
+          data?.selectionHeightStyle ??
           selectionHeightStyle ??
           ui.BoxHeightStyle.tight,
-      selectionWidthStyle: data?.selectionWidthStyle ??
+      selectionWidthStyle:
+          data?.selectionWidthStyle ??
           selectionWidthStyle ??
           ui.BoxWidthStyle.tight,
       obscuringCharacter: data?.obscuringCharacter ?? obscuringCharacter ?? '•',
@@ -655,11 +662,13 @@ class PlatformTextField extends PlatformWidgetBase<
       restorationId: data?.restorationId ?? restorationId,
       maxLengthEnforcement: data?.maxLengthEnforcement ?? maxLengthEnforcement,
       selectionControls: data?.selectionControls ?? selectionControls,
-      enableIMEPersonalizedLearning: data?.enableIMEPersonalizedLearning ??
+      enableIMEPersonalizedLearning:
+          data?.enableIMEPersonalizedLearning ??
           enableIMEPersonalizedLearning ??
           true,
       clipBehavior: data?.clipBehavior ?? clipBehavior,
-      contextMenuBuilder: data?.contextMenuBuilder ??
+      contextMenuBuilder:
+          data?.contextMenuBuilder ??
           contextMenuBuilder ??
           _defaultMaterialContextMenuBuilder,
       onTapOutside: data?.onTapOutside ?? onTapOutside,
@@ -679,7 +688,8 @@ class PlatformTextField extends PlatformWidgetBase<
       ignorePointers: data?.ignorePointers,
       groupId: data?.groupId ?? groupId ?? EditableText,
       onTapUpOutside: data?.onTapUpOutside,
-      stylusHandwritingEnabled: data?.stylusHandwritingEnabled ??
+      stylusHandwritingEnabled:
+          data?.stylusHandwritingEnabled ??
           stylusHandwritingEnabled ??
           EditableText.defaultStylusHandwritingEnabled,
       // toolbarOptions: Deprecated
@@ -716,18 +726,21 @@ class PlatformTextField extends PlatformWidgetBase<
           data?.scrollPadding ?? scrollPadding ?? const EdgeInsets.all(20),
       style: data?.style ?? style,
       textAlign: data?.textAlign ?? textAlign ?? TextAlign.start,
-      textCapitalization: data?.textCapitalization ??
+      textCapitalization:
+          data?.textCapitalization ??
           textCapitalization ??
           TextCapitalization.none,
       textInputAction: data?.textInputAction ?? textInputAction,
-      decoration: data?.decoration ??
+      decoration:
+          data?.decoration ??
           (makeCupertinoDecorationNull
               ? null
               : kDefaultRoundedBorderDecoration),
       clearButtonMode: data?.clearButtonMode ?? OverlayVisibilityMode.never,
       padding: data?.padding ?? const EdgeInsets.all(6),
       placeholder: data?.placeholder ?? hintText,
-      placeholderStyle: data?.placeholderStyle ??
+      placeholderStyle:
+          data?.placeholderStyle ??
           const TextStyle(
             fontWeight: FontWeight.w400,
             color: CupertinoColors.placeholderText,
@@ -736,14 +749,16 @@ class PlatformTextField extends PlatformWidgetBase<
       prefixMode: data?.prefixMode ?? OverlayVisibilityMode.always,
       suffix: data?.suffix,
       suffixMode: data?.suffixMode ?? OverlayVisibilityMode.always,
-      dragStartBehavior: data?.dragStartBehavior ??
+      dragStartBehavior:
+          data?.dragStartBehavior ??
           dragStartBehavior ??
           DragStartBehavior.start,
       expands: data?.expands ?? expands ?? false,
       minLines: data?.minLines ?? minLines,
       scrollPhysics: data?.scrollPhysics ?? scrollPhysics,
       strutStyle: data?.strutStyle ?? strutStyle,
-      enableInteractiveSelection: data?.enableInteractiveSelection ??
+      enableInteractiveSelection:
+          data?.enableInteractiveSelection ??
           enableInteractiveSelection ??
           true,
       scrollController: data?.scrollController ?? scrollController,
@@ -754,10 +769,12 @@ class PlatformTextField extends PlatformWidgetBase<
       enableSuggestions: data?.enableSuggestions ?? true,
       smartQuotesType: data?.smartQuotesType ?? smartQuotesType,
       smartDashesType: data?.smartDashesType ?? smartDashesType,
-      selectionHeightStyle: data?.selectionHeightStyle ??
+      selectionHeightStyle:
+          data?.selectionHeightStyle ??
           selectionHeightStyle ??
           ui.BoxHeightStyle.tight,
-      selectionWidthStyle: data?.selectionWidthStyle ??
+      selectionWidthStyle:
+          data?.selectionWidthStyle ??
           selectionWidthStyle ??
           ui.BoxWidthStyle.tight,
       obscuringCharacter: data?.obscuringCharacter ?? obscuringCharacter ?? '•',
@@ -766,13 +783,15 @@ class PlatformTextField extends PlatformWidgetBase<
       restorationId: data?.restorationId ?? restorationId,
       maxLengthEnforcement: data?.maxLengthEnforcement ?? maxLengthEnforcement,
       selectionControls: data?.selectionControls ?? selectionControls,
-      enableIMEPersonalizedLearning: data?.enableIMEPersonalizedLearning ??
+      enableIMEPersonalizedLearning:
+          data?.enableIMEPersonalizedLearning ??
           enableIMEPersonalizedLearning ??
           true,
       textDirection: data?.textDirection,
       clipBehavior: data?.clipBehavior ?? clipBehavior,
 
-      contextMenuBuilder: data?.contextMenuBuilder ??
+      contextMenuBuilder:
+          data?.contextMenuBuilder ??
           contextMenuBuilder ??
           _defaultCupertinoContextMenuBuilder,
       onTapOutside: data?.onTapOutside ?? onTapOutside,
@@ -789,7 +808,8 @@ class PlatformTextField extends PlatformWidgetBase<
       crossAxisAlignment: data?.crossAxisAlignment ?? CrossAxisAlignment.center,
       groupId: data?.groupId ?? groupId ?? EditableText,
       onTapUpOutside: data?.onTapUpOutside,
-      stylusHandwritingEnabled: data?.stylusHandwritingEnabled ??
+      stylusHandwritingEnabled:
+          data?.stylusHandwritingEnabled ??
           stylusHandwritingEnabled ??
           EditableText.defaultStylusHandwritingEnabled,
       // toolbarOptions: Deprecated
@@ -798,10 +818,10 @@ class PlatformTextField extends PlatformWidgetBase<
   }
 
   @override
-  TextBox createWindowsWidget(BuildContext context) {
+  fluent.TextBox createWindowsWidget(BuildContext context) {
     final data = windows?.call(context, platform(context));
 
-    return TextBox(
+    return fluent.TextBox(
       key: data?.widgetKey ?? widgetKey,
       placeholder: hintText,
       autocorrect: data?.autocorrect ?? autocorrect ?? true,
@@ -826,20 +846,23 @@ class PlatformTextField extends PlatformWidgetBase<
           data?.scrollPadding ?? scrollPadding ?? const EdgeInsets.all(20),
       style: data?.style ?? style,
       textAlign: data?.textAlign ?? textAlign ?? TextAlign.start,
-      textCapitalization: data?.textCapitalization ??
+      textCapitalization:
+          data?.textCapitalization ??
           textCapitalization ??
           TextCapitalization.none,
       textInputAction: data?.textInputAction ?? textInputAction,
       decoration: data?.decoration,
       textDirection: data?.textDirection,
-      dragStartBehavior: data?.dragStartBehavior ??
+      dragStartBehavior:
+          data?.dragStartBehavior ??
           dragStartBehavior ??
           DragStartBehavior.start,
       expands: data?.expands ?? expands ?? false,
       minLines: data?.minLines ?? minLines,
       scrollPhysics: data?.scrollPhysics ?? scrollPhysics,
       strutStyle: data?.strutStyle ?? strutStyle,
-      enableInteractiveSelection: data?.enableInteractiveSelection ??
+      enableInteractiveSelection:
+          data?.enableInteractiveSelection ??
           enableInteractiveSelection ??
           true,
       scrollController: data?.scrollController ?? scrollController,
@@ -850,10 +873,12 @@ class PlatformTextField extends PlatformWidgetBase<
       enableSuggestions: data?.enableSuggestions ?? true,
       smartQuotesType: data?.smartQuotesType ?? smartQuotesType,
       smartDashesType: data?.smartDashesType ?? smartDashesType,
-      selectionHeightStyle: data?.selectionHeightStyle ??
+      selectionHeightStyle:
+          data?.selectionHeightStyle ??
           selectionHeightStyle ??
           ui.BoxHeightStyle.tight,
-      selectionWidthStyle: data?.selectionWidthStyle ??
+      selectionWidthStyle:
+          data?.selectionWidthStyle ??
           selectionWidthStyle ??
           ui.BoxWidthStyle.tight,
       obscuringCharacter: data?.obscuringCharacter ?? obscuringCharacter ?? '•',
@@ -862,12 +887,15 @@ class PlatformTextField extends PlatformWidgetBase<
       restorationId: data?.restorationId ?? restorationId,
       maxLengthEnforcement: data?.maxLengthEnforcement ?? maxLengthEnforcement,
       selectionControls: data?.selectionControls ?? selectionControls,
-      enableIMEPersonalizedLearning: data?.enableIMEPersonalizedLearning ??
+      enableIMEPersonalizedLearning:
+          data?.enableIMEPersonalizedLearning ??
           enableIMEPersonalizedLearning ??
           true,
       clipBehavior: data?.clipBehavior ?? clipBehavior,
-      scribbleEnabled: data?.scribbleEnabled ?? scribbleEnabled,
-      contextMenuBuilder: data?.contextMenuBuilder ??
+      scribbleEnabled:
+          data?.stylusHandwritingEnabled ?? stylusHandwritingEnabled ?? true,
+      contextMenuBuilder:
+          data?.contextMenuBuilder ??
           contextMenuBuilder ??
           _defaultFluentContextMenuBuilder,
       onTapOutside: data?.onTapOutside ?? onTapOutside,

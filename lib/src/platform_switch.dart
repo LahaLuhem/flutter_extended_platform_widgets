@@ -4,13 +4,13 @@
  * See LICENSE for distribution and usage details.
  */
 
+import 'package:fluent_ui/fluent_ui.dart' show ToggleSwitch;
 import 'package:flutter/cupertino.dart' show CupertinoSwitch;
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart' show MaterialTapTargetSize, Switch;
 import 'package:flutter/widgets.dart';
-import 'package:fluent_ui/fluent_ui.dart' show ToggleSwitch;
 import 'package:flutter_extended_platform_widgets/src/extensions/macos_color_extensions.dart';
-import 'package:macos_ui/macos_ui.dart' show MacosColor, MacosSwitch;
+import 'package:macos_ui/macos_ui.dart' show MacosSwitch;
 
 import 'platform.dart';
 import 'widget_base.dart';
@@ -147,8 +147,17 @@ class FluentSwitchData extends _BaseData {
   });
 }
 
-class PlatformSwitch extends PlatformWidgetBase<Switch, CupertinoSwitch,
-    ToggleSwitch, MacosSwitch, Switch, Switch, Switch> {
+class PlatformSwitch
+    extends
+        PlatformWidgetBase<
+          Switch,
+          CupertinoSwitch,
+          ToggleSwitch,
+          MacosSwitch,
+          Switch,
+          Switch,
+          Switch
+        > {
   final Key? widgetKey;
 
   final bool value;
@@ -221,7 +230,8 @@ class PlatformSwitch extends PlatformWidgetBase<Switch, CupertinoSwitch,
       inactiveThumbImage: data?.inactiveThumbImage ?? inactiveThumbImage,
       inactiveTrackColor: data?.inactiveTrackColor ?? inactiveTrackColor,
       materialTapTargetSize: data?.materialTapTargetSize,
-      dragStartBehavior: data?.dragStartBehavior ??
+      dragStartBehavior:
+          data?.dragStartBehavior ??
           dragStartBehavior ??
           DragStartBehavior.start,
       autofocus: data?.autofocus ?? autofocus ?? false,
@@ -253,7 +263,8 @@ class PlatformSwitch extends PlatformWidgetBase<Switch, CupertinoSwitch,
       key: data?.widgetKey ?? widgetKey,
       value: data?.value ?? value,
       onChanged: data?.onChanged ?? onChanged,
-      dragStartBehavior: data?.dragStartBehavior ??
+      dragStartBehavior:
+          data?.dragStartBehavior ??
           dragStartBehavior ??
           DragStartBehavior.start,
       thumbColor: data?.thumbColor,
@@ -304,10 +315,11 @@ class PlatformSwitch extends PlatformWidgetBase<Switch, CupertinoSwitch,
       value: data?.value ?? value,
       onChanged: data?.onChanged ?? onChanged,
       activeColor: (data?.activeColor ?? activeColor)?.toMacosColor(),
-      dragStartBehavior: data?.dragStartBehavior ??
+      dragStartBehavior:
+          data?.dragStartBehavior ??
           dragStartBehavior ??
           DragStartBehavior.start,
-      trackColor: data?.trackColor?.toMacosColor(),
+      trackColor: data?.activeTrackColor?.toMacosColor(),
       knobColor: data?.thumbColor?.toMacosColor(),
     );
   }

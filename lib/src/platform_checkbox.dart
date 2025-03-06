@@ -4,7 +4,8 @@
  * See LICENSE for distribution and usage details.
  */
 
-import 'package:flutter/cupertino.dart' show CupertinoCheckbox, CupertinoColors;
+import 'package:fluent_ui/fluent_ui.dart' as fluent;
+import 'package:flutter/cupertino.dart' show CupertinoCheckbox;
 import 'package:flutter/material.dart'
     show Checkbox, MaterialTapTargetSize, VisualDensity;
 import 'package:flutter/widgets.dart';
@@ -63,8 +64,8 @@ class MaterialCheckboxData extends _BaseData {
     super.mouseCursor,
     super.fillColor,
     super.semanticLabel,
-    //Material
 
+    //Material
     this.hoverColor,
     this.overlayColor,
     this.splashRadius,
@@ -101,7 +102,37 @@ class CupertinoCheckboxData extends _BaseData {
   });
 }
 
-class PlatformCheckbox extends PlatformWidgetBase<CupertinoCheckbox, Checkbox> {
+class FluentCheckboxData extends _BaseData {
+  FluentCheckboxData({
+    // Common
+    super.widgetKey,
+    super.value,
+    super.tristate,
+    super.onChanged,
+    super.activeColor,
+    super.checkColor,
+    super.focusColor,
+    super.focusNode,
+    super.autofocus,
+    super.shape,
+    super.side,
+    this.checkboxThemeData,
+  });
+
+  final fluent.CheckboxThemeData? checkboxThemeData;
+}
+
+class PlatformCheckbox
+    extends
+        PlatformWidgetBase<
+          Checkbox,
+          CupertinoCheckbox,
+          _FluentCheckBox,
+          CupertinoCheckbox,
+          Checkbox,
+          Checkbox,
+          Checkbox
+        > {
   //Common
   final Key? widgetKey;
   final bool? value;
@@ -121,8 +152,13 @@ class PlatformCheckbox extends PlatformWidgetBase<CupertinoCheckbox, Checkbox> {
   //Platform
   final PlatformBuilder<MaterialCheckboxData>? material;
   final PlatformBuilder<CupertinoCheckboxData>? cupertino;
+  final PlatformBuilder<FluentCheckboxData>? windows;
+  final PlatformBuilder<CupertinoCheckboxData>? macos;
+  final PlatformBuilder<MaterialCheckboxData>? linux;
+  final PlatformBuilder<MaterialCheckboxData>? fuchsia;
+  final PlatformBuilder<MaterialCheckboxData>? web;
 
-  PlatformCheckbox({
+  const PlatformCheckbox({
     required this.onChanged,
     //Common
     super.key,
@@ -142,6 +178,11 @@ class PlatformCheckbox extends PlatformWidgetBase<CupertinoCheckbox, Checkbox> {
     //Platform
     this.material,
     this.cupertino,
+    this.windows,
+    this.macos,
+    this.linux,
+    this.fuchsia,
+    this.web,
   });
 
   @override
@@ -191,13 +232,6 @@ class PlatformCheckbox extends PlatformWidgetBase<CupertinoCheckbox, Checkbox> {
       tristate: tristate,
       onChanged: data?.onChanged ?? onChanged,
       activeColor: data?.activeColor ?? activeColor,
-      fillColor: WidgetStateProperty.resolveWith((Set<WidgetState> states) {
-        if (states.contains(WidgetState.disabled))
-          return CupertinoColors.white.withValues(alpha: 0.5);
-        if (states.contains(WidgetState.selected))
-          return data?.activeColor ?? activeColor;
-        return data?.fillColor;
-      }),
       checkColor: data?.checkColor ?? checkColor,
       focusColor: data?.focusColor ?? focusColor,
       focusNode: data?.focusNode ?? focusNode,
@@ -207,6 +241,68 @@ class PlatformCheckbox extends PlatformWidgetBase<CupertinoCheckbox, Checkbox> {
       fillColor: data?.fillColor ?? fillColor,
       mouseCursor: data?.mouseCursor ?? mouseCursor,
       semanticLabel: data?.semanticLabel ?? semanticLabel,
+    );
+  }
+
+  @override
+  _FluentCheckBox createWindowsWidget(BuildContext context) => _FluentCheckBox(
+    data: windows?.call(context, platform(context)),
+    value: value,
+    onChanged: onChanged,
+    focusNode: focusNode,
+    autofocus: autofocus,
+  );
+
+  //Todo(mehul): change themes here
+  @override
+  CupertinoCheckbox createMacosWidget(BuildContext context) =>
+      createCupertinoWidget(context);
+
+  @override
+  Checkbox createLinuxWidget(BuildContext context) =>
+      createMaterialWidget(context);
+
+  @override
+  Checkbox createFuchsiaWidget(BuildContext context) =>
+      createMaterialWidget(context);
+
+  @override
+  Checkbox createWebWidget(BuildContext context) =>
+      createMaterialWidget(context);
+}
+
+class _FluentCheckBox extends StatelessWidget {
+  _FluentCheckBox({
+    required this.data,
+    required bool? value,
+    required this.onChanged,
+    required this.focusNode,
+    required this.autofocus,
+  }) : _isCheckedNotifier = ValueNotifier(data?.value ?? value);
+
+  final FluentCheckboxData? data;
+  final void Function(bool?)? onChanged;
+  final FocusNode? focusNode;
+  final bool? autofocus;
+
+  final ValueNotifier<bool?> _isCheckedNotifier;
+
+  @override
+  Widget build(BuildContext context) {
+    return fluent.Checkbox(
+      key: data?.widgetKey ?? key,
+      checked: _isCheckedNotifier.value,
+      onChanged: (newValue) {
+        _isCheckedNotifier.value = newValue;
+        if (data?.onChanged != null) {
+          data!.onChanged!(newValue);
+        } else if (onChanged != null) {
+          onChanged!(newValue);
+        }
+      },
+      focusNode: data?.focusNode ?? focusNode,
+      autofocus: data?.autofocus ?? autofocus ?? false,
+      style: data?.checkboxThemeData,
     );
   }
 }

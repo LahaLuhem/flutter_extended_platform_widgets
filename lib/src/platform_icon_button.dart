@@ -4,6 +4,7 @@
  * See LICENSE for distribution and usage details.
  */
 
+import 'package:fluent_ui/fluent_ui.dart' as fluent;
 import 'package:flutter/cupertino.dart'
     show
         CupertinoButton,
@@ -13,11 +14,9 @@ import 'package:flutter/cupertino.dart'
 import 'package:flutter/material.dart'
     show IconButton, VisualDensity, ButtonStyle;
 import 'package:flutter/widgets.dart';
-import 'package:flutter_platform_widgets/src/parent_widget_finder.dart';
+import 'package:flutter_extended_platform_widgets/flutter_extended_platform_widgets.dart';
 
-import 'platform.dart';
-import 'widget_base.dart';
-import 'platform_provider.dart';
+import 'parent_widget_finder.dart';
 
 const double _kMinInteractiveDimensionCupertino = 44.0;
 
@@ -121,12 +120,47 @@ class MaterialIconButtonData extends _BaseData {
   final ValueChanged<bool>? onHover;
 }
 
-class PlatformIconButton extends PlatformWidgetBase<CupertinoButton, Widget> {
+class FluentIconButtonData extends _BaseData {
+  FluentIconButtonData({
+    super.widgetKey,
+    super.icon,
+    super.onPressed,
+    super.padding,
+    super.color,
+    super.disabledColor,
+    this.focusNode,
+    this.autofocus,
+    this.style,
+    this.iconButtonMode,
+  });
+
+  final FocusNode? focusNode;
+  final bool? autofocus;
+  final fluent.IconButtonMode? iconButtonMode;
+  final fluent.ButtonStyle? style;
+}
+
+class PlatformIconButton
+    extends
+        PlatformWidgetBase<
+          IconButton,
+          CupertinoButton,
+          fluent.IconButton,
+          CupertinoButton,
+          IconButton,
+          IconButton,
+          IconButton
+        > {
   final Key? widgetKey;
 
   final Widget? icon;
   final Widget? cupertinoIcon;
   final Widget? materialIcon;
+  final Widget? windowsIcon;
+  final Widget? macosIcon;
+  final Widget? linuxIcon;
+  final Widget? fuchsiaIcon;
+  final Widget? webIcon;
   final void Function()? onPressed;
   final Color? color;
   final EdgeInsets? padding;
@@ -135,13 +169,23 @@ class PlatformIconButton extends PlatformWidgetBase<CupertinoButton, Widget> {
 
   final PlatformBuilder<MaterialIconButtonData>? material;
   final PlatformBuilder<CupertinoIconButtonData>? cupertino;
+  final PlatformBuilder<FluentIconButtonData>? windows;
+  final PlatformBuilder<CupertinoIconButtonData>? macos;
+  final PlatformBuilder<MaterialIconButtonData>? linux;
+  final PlatformBuilder<CupertinoIconButtonData>? fuchsia;
+  final PlatformBuilder<MaterialIconButtonData>? web;
 
-  PlatformIconButton({
+  const PlatformIconButton({
     super.key,
     this.widgetKey,
     this.icon,
     this.cupertinoIcon,
     this.materialIcon,
+    this.windowsIcon,
+    this.macosIcon,
+    this.linuxIcon,
+    this.fuchsiaIcon,
+    this.webIcon,
     this.onPressed,
     this.color,
     this.disabledColor,
@@ -149,10 +193,15 @@ class PlatformIconButton extends PlatformWidgetBase<CupertinoButton, Widget> {
     this.onLongPress,
     this.material,
     this.cupertino,
+    this.windows,
+    this.macos,
+    this.linux,
+    this.fuchsia,
+    this.web,
   });
 
   @override
-  Widget createMaterialWidget(BuildContext context) {
+  IconButton createMaterialWidget(BuildContext context) {
     final data = material?.call(context, platform(context));
 
     // icon is required non nullable
@@ -195,9 +244,10 @@ class PlatformIconButton extends PlatformWidgetBase<CupertinoButton, Widget> {
     assert(data?.icon != null || cupertinoIcon != null || icon != null);
 
     // If the IconButton is placed inside the AppBar, we need to have zero padding.
-    final haveZeroPadding = PlatformProvider.of(context)
-            ?.settings
-            .iosUseZeroPaddingForAppbarPlatformIcon ??
+    final haveZeroPadding =
+        PlatformProvider.of(
+          context,
+        )?.settings.iosUseZeroPaddingForAppbarPlatformIcon ??
         false;
     final isPlacedOnPlatformAppBar =
         ParentWidgetFinder.of<CupertinoNavigationBar>(context) != null;
@@ -212,11 +262,13 @@ class PlatformIconButton extends PlatformWidgetBase<CupertinoButton, Widget> {
       onPressed: data?.onPressed ?? onPressed ?? null,
       padding: givenPadding,
       color: data?.color ?? color,
-      borderRadius: data?.borderRadius ??
+      borderRadius:
+          data?.borderRadius ??
           const BorderRadius.all(const Radius.circular(8.0)),
       minSize: data?.minSize ?? _kMinInteractiveDimensionCupertino,
       pressedOpacity: data?.pressedOpacity ?? 0.4,
-      disabledColor: data?.disabledColor ??
+      disabledColor:
+          data?.disabledColor ??
           disabledColor ??
           CupertinoColors.quaternarySystemFill,
       alignment: data?.alignment ?? Alignment.center,
@@ -228,4 +280,39 @@ class PlatformIconButton extends PlatformWidgetBase<CupertinoButton, Widget> {
       sizeStyle: data?.sizeStyle ?? CupertinoButtonSize.large,
     );
   }
+
+  @override
+  fluent.IconButton createWindowsWidget(BuildContext context) {
+    final data = windows?.call(context, platform(context));
+
+    // icon is required non nullable
+    assert(data?.icon != null || cupertinoIcon != null || icon != null);
+
+    return fluent.IconButton(
+      key: data?.widgetKey ?? widgetKey,
+      icon: data?.icon ?? windowsIcon ?? icon!,
+      onPressed: data?.onPressed ?? onPressed,
+      style: data?.style,
+      focusNode: data?.focusNode,
+      autofocus: data?.autofocus ?? false,
+      iconButtonMode: data?.iconButtonMode,
+    );
+  }
+
+  //Todo(mehul): change themes here
+  @override
+  CupertinoButton createMacosWidget(BuildContext context) =>
+      createCupertinoWidget(context);
+
+  @override
+  IconButton createLinuxWidget(BuildContext context) =>
+      createMaterialWidget(context);
+
+  @override
+  IconButton createFuchsiaWidget(BuildContext context) =>
+      createMaterialWidget(context);
+
+  @override
+  IconButton createWebWidget(BuildContext context) =>
+      createMaterialWidget(context);
 }

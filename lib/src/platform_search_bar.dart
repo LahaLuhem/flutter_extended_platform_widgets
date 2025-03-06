@@ -7,6 +7,7 @@
 import 'package:fluent_ui/fluent_ui.dart' show AutoSuggestBox;
 import 'package:flutter/cupertino.dart'
     show
+        CupertinoSearchTextField,
         CupertinoColors,
         OverlayVisibilityMode,
         CupertinoIcons;
@@ -15,19 +16,11 @@ import 'package:flutter/material.dart'
 import 'package:flutter/services.dart' show TextCapitalization, TextInputAction;
 import 'package:flutter/widgets.dart';
 
-import 'package:flutter_extended_platform_widgets/src/platform.dart';
-import 'package:flutter_extended_platform_widgets/src/widget_base.dart';
+import 'platform.dart';
+import 'widget_base.dart';
 
 abstract class _BaseData {
-  final Key? widgetKey;
-  final FocusNode? focusNode;
-  final TextEditingController? controller;
-  final void Function()? onTap;
-  final ValueChanged<String>? onChanged;
-  final TextInputType? keyboardType;
-  final bool? autofocus;
-
-  const _BaseData({
+  _BaseData({
     this.widgetKey,
     this.controller,
     this.focusNode,
@@ -145,18 +138,18 @@ class CupertinoSearchBarData extends _BaseData {
     this.cursorOpacityAnimates,
     this.cursorRadius,
     this.cursorWidth,
-  })  : assert(
-          !((decoration != null) && (backgroundColor != null)),
-          'Cannot provide both a background color and a decoration\n'
-          'To provide both, use "decoration: BoxDecoration(color: '
-          'backgroundColor)"',
-        ),
-        assert(
-          !((decoration != null) && (borderRadius != null)),
-          'Cannot provide both a border radius and a decoration\n'
-          'To provide both, use "decoration: BoxDecoration(borderRadius: '
-          'borderRadius)"',
-        );
+  }) : assert(
+         !((decoration != null) && (backgroundColor != null)),
+         'Cannot provide both a background color and a decoration\n'
+         'To provide both, use "decoration: BoxDecoration(color: '
+         'backgroundColor)"',
+       ),
+       assert(
+         !((decoration != null) && (borderRadius != null)),
+         'Cannot provide both a border radius and a decoration\n'
+         'To provide both, use "decoration: BoxDecoration(borderRadius: '
+         'borderRadius)"',
+       );
   final ValueChanged<String>? onSubmitted;
   final BoxDecoration? decoration;
   final BorderRadius? borderRadius;
@@ -208,15 +201,19 @@ class FluentSearchBarData extends _BaseData {
   final String? hintText;
 }
 
-class PlatformSearchBar extends PlatformWidgetBase<
-    SearchBar,
-    CupertinoSearchTextField,
-    AutoSuggestBox,
-    CupertinoSearchTextField,
-    SearchBar,
-    SearchBar,
-    SearchBar> {
+class PlatformSearchBar
+    extends
+        PlatformWidgetBase<
+          SearchBar,
+          CupertinoSearchTextField,
+          AutoSuggestBox,
+          CupertinoSearchTextField,
+          SearchBar,
+          SearchBar,
+          SearchBar
+        > {
   final Key? widgetKey;
+
   //Common
   final FocusNode? focusNode;
   final TextEditingController? controller;
@@ -272,7 +269,8 @@ class PlatformSearchBar extends PlatformWidgetBase<
     EditableTextState editableTextState,
   ) {
     return AdaptiveTextSelectionToolbar.editableText(
-        editableTextState: editableTextState);
+      editableTextState: editableTextState,
+    );
   }
 
   @override
@@ -289,22 +287,24 @@ class PlatformSearchBar extends PlatformWidgetBase<
       onTap: data?.onTap ?? onTap,
       onChanged: data?.onChanged ?? onChanged,
 
-      backgroundColor: data?.backgroundColor ??
+      backgroundColor:
+          data?.backgroundColor ??
           (backgroundColor != null
               ? WidgetStateProperty.all<Color>(backgroundColor)
               : null),
       hintText: data?.hintText ?? hintText,
-      hintStyle: data?.hintStyle ??
+      hintStyle:
+          data?.hintStyle ??
           (hintStyle != null
               ? WidgetStateProperty.all<TextStyle>(hintStyle)
               : null),
-      textStyle: data?.textStyle ??
+      textStyle:
+          data?.textStyle ??
           (textStyle != null
               ? WidgetStateProperty.all<TextStyle>(textStyle)
               : null),
       autoFocus: data?.autofocus ?? autoFocus ?? false,
       keyboardType: data?.keyboardType ?? keyboardType,
-      enabled: data?.enabled ?? enabled ?? true,
 
       //Material only
       leading: data?.leading,
@@ -346,7 +346,6 @@ class PlatformSearchBar extends PlatformWidgetBase<
       style: data?.style ?? textStyle,
       autofocus: data?.autofocus ?? autoFocus ?? false,
       keyboardType: data?.keyboardType ?? keyboardType ?? TextInputType.text,
-      enabled: data?.enabled,
 
       //Cupertino only
       onSubmitted: data?.onSubmitted,
@@ -354,10 +353,12 @@ class PlatformSearchBar extends PlatformWidgetBase<
       borderRadius: data?.borderRadius,
       itemColor: data?.itemColor ?? CupertinoColors.secondaryLabel,
       itemSize: data?.itemSize ?? 20.0,
-      prefixInsets: data?.prefixInsets ??
+      prefixInsets:
+          data?.prefixInsets ??
           const EdgeInsetsDirectional.fromSTEB(6, 0, 0, 3),
       prefixIcon: data?.prefixIcon ?? const Icon(CupertinoIcons.search),
-      suffixInsets: data?.suffixInsets ??
+      suffixInsets:
+          data?.suffixInsets ??
           const EdgeInsetsDirectional.fromSTEB(0, 0, 5, 2),
       suffixIcon:
           data?.suffixIcon ?? const Icon(CupertinoIcons.xmark_circle_fill),
@@ -391,9 +392,10 @@ class PlatformSearchBar extends PlatformWidgetBase<
       trailingIcon: data?.trailing,
       placeholder: data?.hintText ?? hintText,
       focusNode: data?.focusNode ?? focusNode,
-      onChanged: onSearchChanged == null
-          ? null
-          : (text, reason) => onSearchChanged(text),
+      onChanged:
+          onSearchChanged == null
+              ? null
+              : (text, reason) => onSearchChanged(text),
     );
   }
 

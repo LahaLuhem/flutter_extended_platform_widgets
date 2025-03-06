@@ -1,5 +1,6 @@
 import 'dart:ui' as ui show BoxHeightStyle, BoxWidthStyle;
 
+import 'package:fluent_ui/fluent_ui.dart' as fluent;
 import 'package:flutter/cupertino.dart'
     show
         CupertinoAdaptiveTextSelectionToolbar,
@@ -287,8 +288,86 @@ class CupertinoTextFormFieldData extends _BaseData {
   });
 }
 
+class FluentTextFormFieldData extends _BaseData {
+  FluentTextFormFieldData({
+    super.widgetKey,
+    super.controller,
+    super.initialValue,
+    super.focusNode,
+    super.keyboardType,
+    super.textCapitalization,
+    super.textInputAction,
+    super.style,
+    super.strutStyle,
+    super.textDirection,
+    super.textAlign,
+    super.textAlignVertical,
+    super.autofocus,
+    super.readOnly,
+    super.showCursor,
+    super.obscuringCharacter,
+    super.obscureText,
+    super.autocorrect,
+    super.smartDashesType,
+    super.smartQuotesType,
+    super.enableSuggestions,
+    super.maxLines,
+    super.minLines,
+    super.expands,
+    super.maxLength,
+    super.onChanged,
+    super.onTap,
+    super.onEditingComplete,
+    super.onFieldSubmitted,
+    super.onSaved,
+    super.validator,
+    super.inputFormatters,
+    super.enabled,
+    super.cursorWidth,
+    super.cursorHeight,
+    super.cursorRadius,
+    super.cursorColor,
+    super.keyboardAppearance,
+    super.scrollPadding,
+    super.enableInteractiveSelection,
+    super.selectionControls,
+    super.scrollPhysics,
+    super.autofillHints,
+    super.autovalidateMode,
+    super.contextMenuBuilder,
+    this.maxLengthEnforcement,
+    this.scrollController,
+    this.enableIMEPersonalizedLearning,
+    this.restorationId,
+    this.mouseCursor,
+    this.onTapOutside,
+    this.magnifierConfiguration,
+    this.spellCheckConfiguration,
+    this.decoration,
+  });
+
+  final MaxLengthEnforcement? maxLengthEnforcement;
+  final ScrollController? scrollController;
+  final bool? enableIMEPersonalizedLearning;
+  final String? restorationId;
+  final MouseCursor? mouseCursor;
+  final TapRegionCallback? onTapOutside;
+  final TextMagnifierConfiguration? magnifierConfiguration;
+  final SpellCheckConfiguration? spellCheckConfiguration;
+  final BoxDecoration? decoration;
+}
+
 class PlatformTextFormField
-    extends PlatformWidgetBase<CupertinoTextFormFieldRow, TextFormField> {
+    extends
+        PlatformWidgetBase<
+          TextFormField,
+          CupertinoTextFormFieldRow,
+          fluent.TextFormBox,
+          CupertinoTextFormFieldRow,
+          TextFormField,
+          TextFormField,
+          TextFormField
+        > {
   final Key? widgetKey;
   final TextEditingController? controller;
   final String? initialValue;
@@ -339,20 +418,36 @@ class PlatformTextFormField
 
   final PlatformBuilder<MaterialTextFormFieldData>? material;
   final PlatformBuilder<CupertinoTextFormFieldData>? cupertino;
+  final PlatformBuilder<FluentTextFormFieldData>? windows;
+  final PlatformBuilder<CupertinoTextFormFieldData>? macos;
+  final PlatformBuilder<MaterialTextFormFieldData>? linux;
+  final PlatformBuilder<MaterialTextFormFieldData>? fuchsia;
+  final PlatformBuilder<MaterialTextFormFieldData>? web;
 
   static Widget _defaultMaterialContextMenuBuilder(
-      BuildContext context, EditableTextState editableTextState) {
+    BuildContext context,
+    EditableTextState editableTextState,
+  ) {
     return AdaptiveTextSelectionToolbar.editableText(
       editableTextState: editableTextState,
     );
   }
 
   static Widget _defaultCupertinoContextMenuBuilder(
-      BuildContext context, EditableTextState editableTextState) {
+    BuildContext context,
+    EditableTextState editableTextState,
+  ) {
     return CupertinoAdaptiveTextSelectionToolbar.editableText(
       editableTextState: editableTextState,
     );
   }
+
+  static Widget _defaultFluentContextMenuBuilder(
+    BuildContext context,
+    EditableTextState editableTextState,
+  ) => fluent.FluentTextSelectionToolbar.editableText(
+    editableTextState: editableTextState,
+  );
 
   const PlatformTextFormField({
     super.key,
@@ -404,20 +499,27 @@ class PlatformTextFormField
     this.hintText,
     this.material,
     this.cupertino,
-  }) : keyboardType = keyboardType ??
-            (maxLines == 1 ? TextInputType.text : TextInputType.multiline);
+    this.windows,
+    this.macos,
+    this.linux,
+    this.fuchsia,
+    this.web,
+  }) : keyboardType =
+           keyboardType ??
+           (maxLines == 1 ? TextInputType.text : TextInputType.multiline);
 
   @override
   TextFormField createMaterialWidget(BuildContext context) {
     final data = material?.call(context, platform(context));
 
     final hintText = this.hintText;
-    final decoration = hintText == null
-        ? (data?.decoration ?? const InputDecoration())
-        : _inputDecorationWithHint(
-            hintText,
-            data?.decoration ?? const InputDecoration(),
-          );
+    final decoration =
+        hintText == null
+            ? (data?.decoration ?? const InputDecoration())
+            : _inputDecorationWithHint(
+              hintText,
+              data?.decoration ?? const InputDecoration(),
+            );
 
     return TextFormField(
       key: data?.widgetKey ?? widgetKey,
@@ -426,7 +528,8 @@ class PlatformTextFormField
       focusNode: data?.focusNode ?? focusNode,
       decoration: decoration,
       keyboardType: data?.keyboardType ?? keyboardType,
-      textCapitalization: data?.textCapitalization ??
+      textCapitalization:
+          data?.textCapitalization ??
           textCapitalization ??
           TextCapitalization.none,
       textInputAction: data?.textInputAction ?? textInputAction,
@@ -461,7 +564,8 @@ class PlatformTextFormField
       keyboardAppearance: data?.keyboardAppearance ?? keyboardAppearance,
       scrollPadding:
           data?.scrollPadding ?? scrollPadding ?? const EdgeInsets.all(20),
-      enableInteractiveSelection: data?.enableInteractiveSelection ??
+      enableInteractiveSelection:
+          data?.enableInteractiveSelection ??
           enableInteractiveSelection ??
           true,
       selectionControls: data?.selectionControls ?? selectionControls,
@@ -477,7 +581,8 @@ class PlatformTextFormField
           data?.enableIMEPersonalizedLearning ?? true,
       restorationId: data?.restorationId ?? restorationId,
       mouseCursor: data?.mouseCursor,
-      contextMenuBuilder: data?.contextMenuBuilder ??
+      contextMenuBuilder:
+          data?.contextMenuBuilder ??
           contextMenuBuilder ??
           _defaultMaterialContextMenuBuilder,
       onTapOutside: data?.onTapOutside,
@@ -501,7 +606,8 @@ class PlatformTextFormField
       ignorePointers: data?.ignorePointers,
       groupId: data?.groupId ?? EditableText,
       onTapUpOutside: data?.onTapUpOutside,
-      stylusHandwritingEnabled: data?.stylusHandwritingEnabled ??
+      stylusHandwritingEnabled:
+          data?.stylusHandwritingEnabled ??
           EditableText.defaultStylusHandwritingEnabled,
       // toolbarOptions: , Deprecated
       // scribbleEnabled: deprecated
@@ -519,7 +625,8 @@ class PlatformTextFormField
       focusNode: data?.focusNode ?? focusNode,
       decoration: data?.decoration,
       keyboardType: data?.keyboardType ?? keyboardType,
-      textCapitalization: data?.textCapitalization ??
+      textCapitalization:
+          data?.textCapitalization ??
           textCapitalization ??
           TextCapitalization.none,
       textInputAction: data?.textInputAction ?? textInputAction,
@@ -554,25 +661,29 @@ class PlatformTextFormField
       keyboardAppearance: data?.keyboardAppearance ?? keyboardAppearance,
       scrollPadding:
           data?.scrollPadding ?? scrollPadding ?? const EdgeInsets.all(20),
-      enableInteractiveSelection: data?.enableInteractiveSelection ??
+      enableInteractiveSelection:
+          data?.enableInteractiveSelection ??
           enableInteractiveSelection ??
           true,
       selectionControls: data?.selectionControls ?? selectionControls,
       scrollPhysics: data?.scrollPhysics ?? scrollPhysics,
       autofillHints: data?.autofillHints ?? autofillHints,
-      autovalidateMode: data?.autovalidateMode ??
+      autovalidateMode:
+          data?.autovalidateMode ??
           autovalidateMode ??
           AutovalidateMode.disabled,
       prefix: data?.prefix,
       padding: data?.padding ?? const EdgeInsets.all(6.0),
       placeholder: data?.placeholder ?? hintText,
-      placeholderStyle: data?.placeholderStyle ??
+      placeholderStyle:
+          data?.placeholderStyle ??
           const TextStyle(
             fontWeight: FontWeight.w400,
             color: CupertinoColors.placeholderText,
           ),
       textDirection: data?.textDirection,
-      contextMenuBuilder: data?.contextMenuBuilder ??
+      contextMenuBuilder:
+          data?.contextMenuBuilder ??
           contextMenuBuilder ??
           _defaultCupertinoContextMenuBuilder,
       restorationId: data?.restorationId ?? restorationId,
@@ -581,6 +692,98 @@ class PlatformTextFormField
       // toolbarOptions: , Deprecated
     );
   }
+
+  @override
+  fluent.TextFormBox createWindowsWidget(BuildContext context) {
+    final data = windows?.call(context, platform(context));
+
+    return fluent.TextFormBox(
+      key: data?.widgetKey ?? widgetKey,
+      controller: data?.controller ?? controller,
+      initialValue: data?.initialValue ?? initialValue,
+      placeholder: hintText,
+      focusNode: data?.focusNode ?? focusNode,
+      decoration: data?.decoration,
+      keyboardType: data?.keyboardType ?? keyboardType,
+      textCapitalization:
+          data?.textCapitalization ??
+          textCapitalization ??
+          TextCapitalization.none,
+      textInputAction: data?.textInputAction ?? textInputAction,
+      style: data?.style ?? style,
+      strutStyle: data?.strutStyle ?? strutStyle,
+      textAlign: data?.textAlign ?? textAlign ?? TextAlign.start,
+      textAlignVertical: data?.textAlignVertical ?? textAlignVertical,
+      autofocus: data?.autofocus ?? autofocus ?? false,
+      readOnly: data?.readOnly ?? readOnly ?? false,
+      showCursor: data?.showCursor ?? showCursor,
+      obscuringCharacter: data?.obscuringCharacter ?? obscuringCharacter ?? '•',
+      obscureText: data?.obscureText ?? obscureText ?? false,
+      autocorrect: data?.autocorrect ?? autocorrect ?? true,
+      smartDashesType: data?.smartDashesType ?? smartDashesType,
+      smartQuotesType: data?.smartQuotesType ?? smartQuotesType,
+      enableSuggestions: data?.enableSuggestions ?? enableSuggestions ?? true,
+      maxLines: data?.maxLines ?? maxLines,
+      minLines: data?.minLines ?? minLines,
+      expands: data?.expands ?? expands ?? false,
+      maxLength: data?.maxLength ?? maxLength,
+      onChanged: data?.onChanged ?? onChanged,
+      onTap: data?.onTap ?? onTap,
+      onEditingComplete: data?.onEditingComplete ?? onEditingComplete,
+      onFieldSubmitted: data?.onFieldSubmitted ?? onFieldSubmitted,
+      onSaved: data?.onSaved ?? onSaved,
+      validator: data?.validator ?? validator,
+      inputFormatters: data?.inputFormatters ?? inputFormatters,
+      enabled: data?.enabled ?? enabled ?? true,
+      cursorWidth: data?.cursorWidth ?? cursorWidth ?? 2.0,
+      cursorHeight: data?.cursorHeight ?? cursorHeight,
+      cursorColor: data?.cursorColor ?? cursorColor,
+      keyboardAppearance: data?.keyboardAppearance ?? keyboardAppearance,
+      scrollPadding:
+          data?.scrollPadding ?? scrollPadding ?? const EdgeInsets.all(20),
+      enableInteractiveSelection:
+          data?.enableInteractiveSelection ??
+          enableInteractiveSelection ??
+          true,
+      selectionControls: data?.selectionControls ?? selectionControls,
+      scrollPhysics: data?.scrollPhysics ?? scrollPhysics,
+      autofillHints: data?.autofillHints ?? autofillHints,
+      autovalidateMode: data?.autovalidateMode ?? autovalidateMode,
+      textDirection: data?.textDirection,
+      maxLengthEnforcement: data?.maxLengthEnforcement,
+      cursorRadius: data?.cursorRadius ?? const Radius.circular(2),
+      scrollController: data?.scrollController,
+      enableIMEPersonalizedLearning:
+          data?.enableIMEPersonalizedLearning ?? true,
+      restorationId: data?.restorationId,
+      mouseCursor: data?.mouseCursor,
+      contextMenuBuilder:
+          data?.contextMenuBuilder ??
+          contextMenuBuilder ??
+          _defaultFluentContextMenuBuilder,
+      onTapOutside: data?.onTapOutside,
+      magnifierConfiguration: data?.magnifierConfiguration,
+      spellCheckConfiguration: data?.spellCheckConfiguration,
+      // toolbarOptions: , Deprecated
+    );
+  }
+
+  //Todo(mehul): change themes here
+  @override
+  CupertinoTextFormFieldRow createMacosWidget(BuildContext context) =>
+      createCupertinoWidget(context);
+
+  @override
+  TextFormField createLinuxWidget(BuildContext context) =>
+      createMaterialWidget(context);
+
+  @override
+  TextFormField createFuchsiaWidget(BuildContext context) =>
+      createMaterialWidget(context);
+
+  @override
+  TextFormField createWebWidget(BuildContext context) =>
+      createMaterialWidget(context);
 
   InputDecoration _inputDecorationWithHint(
     String hintText,

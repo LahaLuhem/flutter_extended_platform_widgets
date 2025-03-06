@@ -4,6 +4,8 @@
  * See LICENSE for distribution and usage details.
  */
 
+import 'package:fluent_ui/fluent_ui.dart'
+    show RadioButton, RadioButtonThemeData;
 import 'package:flutter/cupertino.dart' show CupertinoRadio;
 import 'package:flutter/material.dart'
     show Radio, MaterialTapTargetSize, VisualDensity;
@@ -25,6 +27,7 @@ abstract class _BaseData<T> {
     this.autofocus,
     this.mouseCursor,
   });
+
   final Key? widgetKey;
   final T? value;
   final T? groupValue;
@@ -92,7 +95,34 @@ class CupertinoRadioData extends _BaseData {
   final bool? useCheckmarkStyle;
 }
 
-class PlatformRadio<T> extends PlatformWidgetBase<CupertinoRadio, Radio> {
+class FluentRadioData<T> extends _BaseData<T> {
+  FluentRadioData({
+    super.widgetKey,
+    super.value,
+    super.groupValue,
+    super.onChanged,
+    super.toggleable,
+    super.activeColor,
+    super.focusColor,
+    super.focusNode,
+    super.autofocus,
+    this.buttonThemeData,
+  });
+
+  final RadioButtonThemeData? buttonThemeData;
+}
+
+class PlatformRadio<T>
+    extends
+        PlatformWidgetBase<
+          Radio,
+          CupertinoRadio,
+          RadioButton,
+          CupertinoRadio,
+          Radio,
+          Radio,
+          Radio
+        > {
   final Key? widgetKey;
   final T? value;
   final T? groupValue;
@@ -107,8 +137,13 @@ class PlatformRadio<T> extends PlatformWidgetBase<CupertinoRadio, Radio> {
 
   final PlatformBuilder<MaterialRadioData>? material;
   final PlatformBuilder<CupertinoRadioData>? cupertino;
+  final PlatformBuilder<FluentRadioData>? windows;
+  final PlatformBuilder<CupertinoRadioData>? macos;
+  final PlatformBuilder<MaterialRadioData>? linux;
+  final PlatformBuilder<MaterialRadioData>? fuchsia;
+  final PlatformBuilder<MaterialRadioData>? web;
 
-  PlatformRadio({
+  const PlatformRadio({
     super.key,
     this.widgetKey,
     this.value,
@@ -123,6 +158,11 @@ class PlatformRadio<T> extends PlatformWidgetBase<CupertinoRadio, Radio> {
     this.mouseCursor,
     this.material,
     this.cupertino,
+    this.windows,
+    this.macos,
+    this.linux,
+    this.fuchsia,
+    this.web,
   });
 
   @override
@@ -171,4 +211,43 @@ class PlatformRadio<T> extends PlatformWidgetBase<CupertinoRadio, Radio> {
       mouseCursor: data?.mouseCursor ?? mouseCursor,
     );
   }
+
+  @override
+  RadioButton createWindowsWidget(BuildContext context) {
+    final data = windows?.call(context, platform(context));
+    final ownValueInGroup = data?.value ?? value;
+    final currentValueInGroup = data?.groupValue ?? groupValue;
+    final onStateChange = data?.onChanged ?? onChanged;
+
+    return RadioButton(
+      key: data?.widgetKey ?? widgetKey,
+      // Logic to bridge groupVal/val and the simpler widget implementation
+      checked: currentValueInGroup == ownValueInGroup,
+      content:
+          T == String
+              ? Text(ownValueInGroup.toString())
+              : ownValueInGroup as Widget?,
+      onChanged:
+          onStateChange == null ? null : (_) => onStateChange(ownValueInGroup),
+      autofocus: data?.autofocus ?? autofocus,
+      focusNode: data?.focusNode ?? focusNode,
+      style: data?.buttonThemeData,
+    );
+  }
+
+  //Todo(mehul): change themes here
+  @override
+  CupertinoRadio createMacosWidget(BuildContext context) =>
+      createCupertinoWidget(context);
+
+  @override
+  Radio createLinuxWidget(BuildContext context) =>
+      createMaterialWidget(context);
+
+  @override
+  Radio createFuchsiaWidget(BuildContext context) =>
+      createMaterialWidget(context);
+
+  @override
+  Radio createWebWidget(BuildContext context) => createMaterialWidget(context);
 }

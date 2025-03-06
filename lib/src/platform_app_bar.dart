@@ -144,8 +144,26 @@ class CupertinoNavigationBarData extends _BaseData {
   final bool noMaterialParent;
 }
 
+class FluentNavigationBarData extends _BaseData {
+  FluentNavigationBarData({
+    super.backgroundColor,
+    super.leading,
+    super.widgetKey,
+    super.automaticallyImplyLeading,
+  });
+}
+
 class PlatformAppBar
-    extends PlatformWidgetBase<CupertinoNavigationBar, PreferredSizeWidget> {
+    extends
+        PlatformWidgetBase<
+          PreferredSizeWidget,
+          CupertinoNavigationBar,
+          Widget,
+          CupertinoNavigationBar,
+          PreferredSizeWidget,
+          PreferredSizeWidget,
+          PreferredSizeWidget
+        > {
   final Key? widgetKey;
 
   final Widget? title;
@@ -157,8 +175,13 @@ class PlatformAppBar
 
   final PlatformBuilder<MaterialAppBarData>? material;
   final PlatformBuilder<CupertinoNavigationBarData>? cupertino;
+  final PlatformBuilder<FluentNavigationBarData>? windows;
+  final PlatformBuilder<CupertinoNavigationBarData>? macos;
+  final PlatformBuilder<MaterialAppBarData>? linux;
+  final PlatformBuilder<MaterialAppBarData>? fuchsia;
+  final PlatformBuilder<MaterialAppBarData>? web;
 
-  PlatformAppBar({
+  const PlatformAppBar({
     super.key,
     this.widgetKey,
     this.title,
@@ -169,6 +192,11 @@ class PlatformAppBar
     this.bottom,
     this.material,
     this.cupertino,
+    this.windows,
+    this.macos,
+    this.linux,
+    this.fuchsia,
+    this.web,
   });
 
   @override
@@ -216,17 +244,19 @@ class PlatformAppBar
   CupertinoNavigationBar createCupertinoWidget(BuildContext context) {
     final data = cupertino?.call(context, platform(context));
 
-    var trailing = trailingActions?.isEmpty ?? true
-        ? null
-        : Row(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: trailingActions!,
-          );
+    var trailing =
+        trailingActions?.isEmpty ?? true
+            ? null
+            : Row(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: trailingActions!,
+            );
 
     final providerState = PlatformProvider.of(context);
     final noMaterialParent = data?.noMaterialParent ?? false;
-    final useMaterial = (!noMaterialParent) &&
+    final useMaterial =
+        (!noMaterialParent) &&
         (providerState?.settings.iosUsesMaterialWidgets ?? false);
 
     final heroTag = data?.heroTag;
@@ -235,19 +265,22 @@ class PlatformAppBar
         key: data?.widgetKey ?? widgetKey,
         middle: _getMiddleCupertinoWidget(context, data),
         backgroundColor: data?.backgroundColor ?? backgroundColor,
-        automaticallyImplyLeading: data?.automaticallyImplyLeading ??
+        automaticallyImplyLeading:
+            data?.automaticallyImplyLeading ??
             automaticallyImplyLeading ??
             true,
         automaticallyImplyMiddle: data?.automaticallyImplyMiddle ?? true,
         previousPageTitle: data?.previousPageTitle,
         padding: data?.padding,
         border: data?.border ?? _kDefaultNavBarBorder,
-        leading: _getLeadingCupertinoWidget(context, data)
-            ?.withMaterial(useMaterial)
-            .withWidgetFinder<CupertinoNavigationBar>(),
-        trailing: (data?.trailing ?? trailing)
-            ?.withMaterial(useMaterial)
-            .withWidgetFinder<CupertinoNavigationBar>(),
+        leading:
+            _getLeadingCupertinoWidget(context, data)
+                ?.withMaterial(useMaterial)
+                .withWidgetFinder<CupertinoNavigationBar>(),
+        trailing:
+            (data?.trailing ?? trailing)
+                ?.withMaterial(useMaterial)
+                .withWidgetFinder<CupertinoNavigationBar>(),
         transitionBetweenRoutes: data?.transitionBetweenRoutes ?? true,
         brightness: data?.brightness,
         heroTag: heroTag,
@@ -268,12 +301,14 @@ class PlatformAppBar
       previousPageTitle: data?.previousPageTitle,
       padding: data?.padding,
       border: data?.border ?? _kDefaultNavBarBorder,
-      leading: _getLeadingCupertinoWidget(context, data)
-          ?.withMaterial(useMaterial)
-          .withWidgetFinder<CupertinoNavigationBar>(),
-      trailing: (data?.trailing ?? trailing)
-          ?.withMaterial(useMaterial)
-          .withWidgetFinder<CupertinoNavigationBar>(),
+      leading:
+          _getLeadingCupertinoWidget(context, data)
+              ?.withMaterial(useMaterial)
+              .withWidgetFinder<CupertinoNavigationBar>(),
+      trailing:
+          (data?.trailing ?? trailing)
+              ?.withMaterial(useMaterial)
+              .withWidgetFinder<CupertinoNavigationBar>(),
       transitionBetweenRoutes: data?.transitionBetweenRoutes ?? true,
       brightness: data?.brightness,
       automaticBackgroundVisibility:
@@ -329,9 +364,10 @@ class PlatformAppBar
       return null;
     }
 
-    final useMediaQueryWrapper = PlatformProvider.of(context)
-            ?.settings
-            .wrapCupertinoAppBarMiddleWithMediaQuery ??
+    final useMediaQueryWrapper =
+        PlatformProvider.of(
+          context,
+        )?.settings.wrapCupertinoAppBarMiddleWithMediaQuery ??
         true;
 
     if (!useMediaQueryWrapper) {
@@ -345,4 +381,24 @@ class PlatformAppBar
 
     return middleWithMediaQuery;
   }
+
+  @override
+  Widget createWindowsWidget(BuildContext context) => const SizedBox.shrink();
+
+  //Todo(mehul): change themes here
+  @override
+  CupertinoNavigationBar createMacosWidget(BuildContext context) =>
+      createCupertinoWidget(context);
+
+  @override
+  PreferredSizeWidget createLinuxWidget(BuildContext context) =>
+      createMaterialWidget(context);
+
+  @override
+  PreferredSizeWidget createFuchsiaWidget(BuildContext context) =>
+      createMaterialWidget(context);
+
+  @override
+  PreferredSizeWidget createWebWidget(BuildContext context) =>
+      createMaterialWidget(context);
 }

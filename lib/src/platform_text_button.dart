@@ -4,6 +4,7 @@
  * See LICENSE for distribution and usage details.
  */
 
+import 'package:fluent_ui/fluent_ui.dart' as fluent;
 import 'package:flutter/cupertino.dart'
     show CupertinoButton, CupertinoColors, CupertinoTheme, CupertinoButtonSize;
 import 'package:flutter/material.dart'
@@ -16,11 +17,7 @@ import 'widget_base.dart';
 const double _kMinInteractiveDimensionCupertino = 44.0;
 
 abstract class _BaseData {
-  _BaseData({
-    this.widgetKey,
-    this.child,
-    this.onPressed,
-  });
+  _BaseData({this.widgetKey, this.child, this.onPressed});
 
   final Key? widgetKey;
   final Widget? child;
@@ -97,7 +94,44 @@ class CupertinoTextButtonData extends _BaseData {
   final bool originalStyle;
 }
 
-class PlatformTextButton extends PlatformWidgetBase<Widget, TextButton> {
+class FluentTextButtonData extends _BaseData {
+  FluentTextButtonData({
+    super.widgetKey,
+    super.child,
+    super.onPressed,
+    this.onLongPress,
+    this.focusNode,
+    this.style,
+    this.autofocus,
+    this.clipBehavior,
+    this.icon,
+    this.onHover,
+    this.onFocusChange,
+    this.statesController,
+  });
+
+  final VoidCallback? onLongPress;
+  final FocusNode? focusNode;
+  final fluent.ButtonStyle? style;
+  final bool? autofocus;
+  final Clip? clipBehavior;
+  final Widget? icon;
+  final ValueChanged<bool>? onHover;
+  final ValueChanged<bool>? onFocusChange;
+  final WidgetStatesController? statesController;
+}
+
+class PlatformTextButton
+    extends
+        PlatformWidgetBase<
+          TextButton,
+          Widget,
+          fluent.Button,
+          Widget,
+          TextButton,
+          TextButton,
+          TextButton
+        > {
   final Key? widgetKey;
 
   final VoidCallback? onPressed;
@@ -109,8 +143,13 @@ class PlatformTextButton extends PlatformWidgetBase<Widget, TextButton> {
 
   final PlatformBuilder<CupertinoTextButtonData>? cupertino;
   final PlatformBuilder<MaterialTextButtonData>? material;
+  final PlatformBuilder<FluentTextButtonData>? windows;
+  final PlatformBuilder<MaterialTextButtonData>? macos;
+  final PlatformBuilder<MaterialTextButtonData>? linux;
+  final PlatformBuilder<MaterialTextButtonData>? fuchsia;
+  final PlatformBuilder<MaterialTextButtonData>? web;
 
-  PlatformTextButton({
+  const PlatformTextButton({
     super.key,
     this.widgetKey,
     this.onPressed,
@@ -120,6 +159,11 @@ class PlatformTextButton extends PlatformWidgetBase<Widget, TextButton> {
     this.color,
     this.material,
     this.cupertino,
+    this.windows,
+    this.macos,
+    this.linux,
+    this.fuchsia,
+    this.web,
   });
 
   @override
@@ -138,7 +182,8 @@ class PlatformTextButton extends PlatformWidgetBase<Widget, TextButton> {
         autofocus: data?.autofocus ?? false,
         clipBehavior: data?.clipBehavior ?? Clip.none,
         focusNode: data?.focusNode,
-        style: data?.style ??
+        style:
+            data?.style ??
             TextButton.styleFrom(
               backgroundColor: color,
               padding: padding,
@@ -159,7 +204,8 @@ class PlatformTextButton extends PlatformWidgetBase<Widget, TextButton> {
       autofocus: data?.autofocus ?? false,
       clipBehavior: data?.clipBehavior ?? Clip.none,
       focusNode: data?.focusNode,
-      style: data?.style ??
+      style:
+          data?.style ??
           TextButton.styleFrom(
             backgroundColor: color,
             padding: padding,
@@ -181,7 +227,8 @@ class PlatformTextButton extends PlatformWidgetBase<Widget, TextButton> {
         key: data?.widgetKey ?? widgetKey,
         child: data?.child ?? child!,
         onPressed: data?.onPressed ?? onPressed,
-        borderRadius: data?.borderRadius ??
+        borderRadius:
+            data?.borderRadius ??
             const BorderRadius.all(const Radius.circular(8.0)),
         minSize: data?.minSize ?? _kMinInteractiveDimensionCupertino,
         padding: data?.padding ?? padding,
@@ -209,7 +256,8 @@ class PlatformTextButton extends PlatformWidgetBase<Widget, TextButton> {
         key: data?.widgetKey ?? widgetKey,
         child: data?.child ?? child!,
         onPressed: data?.onPressed ?? onPressed,
-        borderRadius: data?.borderRadius ??
+        borderRadius:
+            data?.borderRadius ??
             const BorderRadius.all(const Radius.circular(8.0)),
         minSize: data?.minSize ?? _kMinInteractiveDimensionCupertino,
         padding: data?.padding ?? padding,
@@ -227,4 +275,39 @@ class PlatformTextButton extends PlatformWidgetBase<Widget, TextButton> {
       );
     }
   }
+
+  @override
+  fluent.Button createWindowsWidget(BuildContext context) {
+    final data = windows?.call(context, platform(context));
+
+    final icon = data?.icon;
+
+    assert(icon != null || data?.child != null || child != null);
+    return fluent.Button(
+      key: data?.widgetKey ?? widgetKey,
+      onPressed: data?.onPressed ?? onPressed,
+      onLongPress: data?.onLongPress,
+      autofocus: data?.autofocus ?? false,
+      focusNode: data?.focusNode,
+      style: data?.style,
+      child: (icon != null) ? icon : data?.child ?? child!,
+    );
+  }
+
+  //Todo(mehul): change themes here
+  @override
+  Widget createMacosWidget(BuildContext context) =>
+      createCupertinoWidget(context);
+
+  @override
+  TextButton createLinuxWidget(BuildContext context) =>
+      createMaterialWidget(context);
+
+  @override
+  TextButton createFuchsiaWidget(BuildContext context) =>
+      createMaterialWidget(context);
+
+  @override
+  TextButton createWebWidget(BuildContext context) =>
+      createMaterialWidget(context);
 }
